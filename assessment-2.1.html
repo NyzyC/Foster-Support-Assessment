@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 2 Assessment — Doobert Connect</title>
+  <style>
+    :root {
+      --orange: #E8640A; --orange-dark: #C8540A;
+      --teal: #2E7D8C;   --teal-dark: #235F6E;
+      --light-orange: #FFF4ED; --light-teal: #E8F4F6;
+      --text: #2C2C2C;   --text-light: #666;
+      --border: #D9D9D9; --success: #2E7D52; --danger: #C0392B; --bg: #F5F5F5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 800px; margin: 0 auto; padding: 32px 16px 48px; }
+    .header { background: var(--orange); color: white; padding: 28px 32px; border-radius: 10px 10px 0 0; }
+    .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+    .header p  { font-size: 14px; opacity: 0.9; }
+    .card { background: white; border-radius: 8px; padding: 28px 32px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .card-first { border-radius: 0 0 8px 8px; margin-top: 0; }
+    .info-box { background: var(--light-orange); border-left: 4px solid var(--orange); padding: 16px 20px; border-radius: 0 6px 6px 0; margin-top: 4px; }
+    .info-box h3 { color: var(--orange); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+    .info-box p { font-size: 14px; margin-bottom: 6px; }
+    .info-box p:last-child { margin-bottom: 0; }
+    .trainee-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--teal); margin-bottom: 5px; }
+    input[type="text"], input[type="date"] { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--text); transition: border-color 0.2s; }
+    input[type="text"]:focus, input[type="date"]:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(46,125,140,0.12); }
+    .field-error { border-color: var(--danger) !important; }
+    .section-header { background: var(--teal); color: white; padding: 11px 20px; border-radius: 6px; margin-bottom: 6px; font-size: 15px; font-weight: 600; }
+    .section-subtitle { font-size: 13px; color: var(--text-light); margin-bottom: 24px; padding-left: 2px; }
+    .question { margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid #F0F0F0; }
+    .question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .question-text { font-size: 14.5px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.55; display: flex; align-items: flex-start; gap: 10px; }
+    .question-number { display: inline-flex; align-items: center; justify-content: center; background: var(--orange); color: white; min-width: 26px; height: 26px; border-radius: 50%; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .options { display: flex; flex-direction: column; gap: 8px; }
+    .option-label { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 14px; line-height: 1.5; transition: border-color 0.15s, background 0.15s; user-select: none; }
+    .option-label:hover { border-color: var(--teal); background: var(--light-teal); }
+    .option-label.selected { border-color: var(--teal); background: var(--light-teal); }
+    .option-label input[type="radio"] { margin-top: 3px; flex-shrink: 0; accent-color: var(--teal); cursor: pointer; }
+    .error-msg { color: var(--danger); font-size: 12.5px; margin-top: 6px; display: none; }
+    .btn-submit { display: block; width: 100%; padding: 16px; background: var(--orange); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 0.3px; transition: background 0.2s; font-family: inherit; }
+    .btn-submit:hover:not(:disabled) { background: var(--orange-dark); }
+    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+    .submit-hint { font-size: 13px; color: var(--text-light); text-align: center; margin-bottom: 14px; }
+    .submission-status { text-align: center; padding: 11px 16px; border-radius: 6px; font-size: 14px; margin-top: 12px; display: none; }
+    .submission-status.sending { background: var(--light-teal); color: var(--teal); display: block; }
+    .submission-status.sent    { background: #EDF7ED; color: var(--success); display: block; }
+    .submission-status.failed  { background: #FDE8E6; color: var(--danger); display: block; }
+    .results-card { display: none; background: white; border-radius: 10px; padding: 44px 32px 36px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.09); }
+    .results-card.pass   { border-top: 6px solid var(--success); }
+    .results-card.retake { border-top: 6px solid var(--danger); }
+    .results-module-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: #aaa; margin-bottom: 8px; }
+    .score-display { font-size: 72px; font-weight: 800; line-height: 1; margin: 6px 0 4px; }
+    .score-display.pass   { color: var(--success); }
+    .score-display.retake { color: var(--danger); }
+    .score-total { font-size: 18px; color: #aaa; margin-bottom: 14px; }
+    .verdict { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+    .verdict.pass   { color: var(--success); }
+    .verdict.retake { color: var(--danger); }
+    .results-note { font-size: 14px; color: var(--text-light); max-width: 500px; margin: 0 auto 28px; line-height: 1.75; }
+    .btn-retake { display: inline-block; padding: 12px 32px; background: var(--teal); color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .btn-retake:hover { background: var(--teal-dark); }
+    @media (max-width: 600px) { .trainee-grid { grid-template-columns: 1fr; } .card { padding: 20px 16px; } .score-display { font-size: 56px; } }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Module 2 Assessment</h1>
+    <p>Doobert Connect Foster Support Training</p>
+  </div>
+
+  <div class="card card-first">
+    <div class="info-box">
+      <h3>Before You Begin — Read This</h3>
+      <p>Complete this assessment independently.</p>
+      <p><strong>A score of 80% or higher (34 out of 42) is required to unlock Module 3 and the DC Tools Quick-Reference Cheat Sheet.</strong></p>
+      <p>If you score below 80%, review the indicated sections and retake the assessment.</p>
+      <p>The assessment covers all nine tool sections covered in this module.</p>
+    </div>
+  </div>
+
+  <form id="assessmentForm" novalidate>
+
+    <!-- Trainee Info -->
+    <div class="card">
+      <h2 style="color:var(--teal);font-size:16px;margin-bottom:4px;">Trainee Information</h2>
+      <div class="trainee-grid">
+        <div>
+          <label for="traineeName">Full Name *</label>
+          <input type="text" id="traineeName" placeholder="Your full name" required autocomplete="name">
+          <div class="error-msg" id="nameError">Please enter your full name.</div>
+        </div>
+        <div>
+          <label for="assessmentDate">Date *</label>
+          <input type="date" id="assessmentDate" required>
+          <div class="error-msg" id="dateError">Please select a date.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 1 -->
+    <div class="card">
+      <div class="section-header">Part 1: Core Tool Understanding (Questions 1–10)</div>
+      <p class="section-subtitle">For each question, choose the single best answer.</p>
+
+      <div class="question" id="q1-wrap">
+        <div class="question-text"><span class="question-number">1</span>After identifying which organization a foster belongs to, where do you go first?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q1" value="A"> A. CCM — to look up the foster's case history</label>
+          <label class="option-label"><input type="radio" name="q1" value="B"> B. Internal Site — to access the organization's page and Support Form</label>
+          <label class="option-label"><input type="radio" name="q1" value="C"> C. Connect Email — to check for previous correspondence</label>
+          <label class="option-label"><input type="radio" name="q1" value="D"> D. Dialpad — to note the call before doing anything else</label>
+        </div>
+        <div class="error-msg" id="q1-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q2-wrap">
+        <div class="question-text"><span class="question-number">2</span>Where is the Support Form (JotForm) located?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q2" value="A"> A. In CCM, under the organization's profile</label>
+          <label class="option-label"><input type="radio" name="q2" value="B"> B. In Dialpad, attached to the contact record</label>
+          <label class="option-label"><input type="radio" name="q2" value="C"> C. On the organization's page within the Internal Site</label>
+          <label class="option-label"><input type="radio" name="q2" value="D"> D. In Connect Email, as a saved template</label>
+        </div>
+        <div class="error-msg" id="q2-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q3-wrap">
+        <div class="question-text"><span class="question-number">3</span>What is the primary purpose of the Support Form (JotForm)?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q3" value="A"> A. To send emails to foster coordinators</label>
+          <label class="option-label"><input type="radio" name="q3" value="B"> B. To officially capture case details and create a structured case in CCM</label>
+          <label class="option-label"><input type="radio" name="q3" value="C"> C. To chat with internal team members about a case</label>
+          <label class="option-label"><input type="radio" name="q3" value="D"> D. To store photos and videos sent by the foster</label>
+        </div>
+        <div class="error-msg" id="q3-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q4-wrap">
+        <div class="question-text"><span class="question-number">4</span>Where do submitted Support Form cases appear after submission?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q4" value="A"> A. In Connect Email as a notification</label>
+          <label class="option-label"><input type="radio" name="q4" value="B"> B. In CCM as an active case</label>
+          <label class="option-label"><input type="radio" name="q4" value="C"> C. In Dialpad as a logged interaction</label>
+          <label class="option-label"><input type="radio" name="q4" value="D"> D. In Mattermost as a channel post</label>
+        </div>
+        <div class="error-msg" id="q4-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q5-wrap">
+        <div class="question-text"><span class="question-number">5</span>Which tool is used to receive and respond to calls, text messages, and voicemails from fosters?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q5" value="A"> A. CCM</label>
+          <label class="option-label"><input type="radio" name="q5" value="B"> B. Dialpad</label>
+          <label class="option-label"><input type="radio" name="q5" value="C"> C. Connect Email</label>
+          <label class="option-label"><input type="radio" name="q5" value="D"> D. Mighty Networks</label>
+        </div>
+        <div class="error-msg" id="q5-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q6-wrap">
+        <div class="question-text"><span class="question-number">6</span>Which tool is used for internal team communication during your shift?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q6" value="A"> A. Connect Email — for all internal messages</label>
+          <label class="option-label"><input type="radio" name="q6" value="B"> B. Mattermost — the central internal communication platform</label>
+          <label class="option-label"><input type="radio" name="q6" value="C"> C. CCM — through the case notes section</label>
+          <label class="option-label"><input type="radio" name="q6" value="D"> D. ChatGPT — for team questions</label>
+        </div>
+        <div class="error-msg" id="q6-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q7-wrap">
+        <div class="question-text"><span class="question-number">7</span>Which tool is used to manage, update, and track cases after the Support Form has been submitted?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q7" value="A"> A. Dialpad — through the interaction log</label>
+          <label class="option-label"><input type="radio" name="q7" value="B"> B. CCM (Case &amp; Contact Management)</label>
+          <label class="option-label"><input type="radio" name="q7" value="C"> C. Connect Email — through the email thread</label>
+          <label class="option-label"><input type="radio" name="q7" value="D"> D. JotForm — by re-opening the submitted form</label>
+        </div>
+        <div class="error-msg" id="q7-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q8-wrap">
+        <div class="question-text"><span class="question-number">8</span>Which platform is used by fosters as a community space to share experiences, ask general questions, and connect with each other?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q8" value="A"> A. Dialpad</label>
+          <label class="option-label"><input type="radio" name="q8" value="B"> B. Mighty Networks</label>
+          <label class="option-label"><input type="radio" name="q8" value="C"> C. CCM</label>
+          <label class="option-label"><input type="radio" name="q8" value="D"> D. Mattermost</label>
+        </div>
+        <div class="error-msg" id="q8-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q9-wrap">
+        <div class="question-text"><span class="question-number">9</span>What is ChatGPT primarily used for in the Doobert Connect context?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q9" value="A"> A. Diagnosing animals based on described symptoms</label>
+          <label class="option-label"><input type="radio" name="q9" value="B"> B. Submitting and managing cases in CCM</label>
+          <label class="option-label"><input type="radio" name="q9" value="C"> C. Drafting responses, generating follow-up questions, and improving communication clarity</label>
+          <label class="option-label"><input type="radio" name="q9" value="D"> D. Managing internal team schedules and assignments</label>
+        </div>
+        <div class="error-msg" id="q9-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q10-wrap">
+        <div class="question-text"><span class="question-number">10</span>What is the Internal Chatbot primarily used for?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q10" value="A"> A. Drafting email responses to fosters</label>
+          <label class="option-label"><input type="radio" name="q10" value="B"> B. Diagnosing animal conditions from symptom descriptions</label>
+          <label class="option-label"><input type="radio" name="q10" value="C"> C. Quickly looking up organization-specific information like hours and coordinator contacts</label>
+          <label class="option-label"><input type="radio" name="q10" value="D"> D. Submitting support cases directly without using the JotForm</label>
+        </div>
+        <div class="error-msg" id="q10-err">Please select an answer.</div>
+      </div>
+    </div>
+
+    <!-- PART 2 -->
+    <div class="card">
+      <div class="section-header">Part 2: Workflow &amp; Process (Questions 11–15)</div>
+      <p class="section-subtitle">These questions test your understanding of the correct sequence of tool use.</p>
+
+      <div class="question" id="q11-wrap">
+        <div class="question-text"><span class="question-number">11</span>What is the correct workflow sequence for a standard support case?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q11" value="A"> A. CCM → Dialpad → Connect Email</label>
+          <label class="option-label"><input type="radio" name="q11" value="B"> B. Foster contacts via Dialpad/Email/Mighty Networks → Internal Site → Support Form → CCM → Mattermost (if needed)</label>
+          <label class="option-label"><input type="radio" name="q11" value="C"> C. Connect Email → Mattermost → CCM</label>
+          <label class="option-label"><input type="radio" name="q11" value="D"> D. ChatGPT → CCM → Connect Email</label>
+        </div>
+        <div class="error-msg" id="q11-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q12-wrap">
+        <div class="question-text"><span class="question-number">12</span>When during the support interaction should you open the Support Form?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q12" value="A"> A. After the interaction is completely finished and you have all the information</label>
+          <label class="option-label"><input type="radio" name="q12" value="B"> B. At the very end, just before submitting</label>
+          <label class="option-label"><input type="radio" name="q12" value="C"> C. As soon as you identify the organization — before you finish gathering information</label>
+          <label class="option-label"><input type="radio" name="q12" value="D"> D. Only if the case turns out to be medical or urgent</label>
+        </div>
+        <div class="error-msg" id="q12-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q13-wrap">
+        <div class="question-text"><span class="question-number">13</span>Why is it important to open the Support Form before finishing your questions?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q13" value="A"> A. It automatically submits the case while you talk</label>
+          <label class="option-label"><input type="radio" name="q13" value="B"> B. It guides your questions by showing you exactly what information is required for that organization</label>
+          <label class="option-label"><input type="radio" name="q13" value="C"> C. It skips steps and makes the process faster</label>
+          <label class="option-label"><input type="radio" name="q13" value="D"> D. It connects directly to Dialpad and records the call</label>
+        </div>
+        <div class="error-msg" id="q13-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q14-wrap">
+        <div class="question-text"><span class="question-number">14</span>What ensures that a case moves forward efficiently and requires no follow-up questions from the organization?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q14" value="A"> A. Responding to the foster as quickly as possible</label>
+          <label class="option-label"><input type="radio" name="q14" value="B"> B. Keeping the case notes as brief as possible to save time</label>
+          <label class="option-label"><input type="radio" name="q14" value="C"> C. Submitting a complete, accurate Support Form with all required details clearly documented</label>
+          <label class="option-label"><input type="radio" name="q14" value="D"> D. Sending a verbal update to the team via Mattermost instead of using the form</label>
+        </div>
+        <div class="error-msg" id="q14-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q15-wrap">
+        <div class="question-text"><span class="question-number">15</span>After finishing a call with a foster in Dialpad, what should you do immediately?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q15" value="A"> A. Close the case and wait for the foster to follow up if needed</label>
+          <label class="option-label"><input type="radio" name="q15" value="B"> B. Go to the Internal Site, open the Support Form for the correct organization, and submit the case with all details captured during the call</label>
+          <label class="option-label"><input type="radio" name="q15" value="C"> C. Ask ChatGPT to summarize what was discussed</label>
+          <label class="option-label"><input type="radio" name="q15" value="D"> D. Send the foster a follow-up text and do nothing else</label>
+        </div>
+        <div class="error-msg" id="q15-err">Please select an answer.</div>
+      </div>
+    </div>
+
+    <!-- PART 3 -->
+    <div class="card">
+      <div class="section-header">Part 3: Support Form (JotForm) Accuracy (Questions 16–20)</div>
+
+      <div class="question" id="q16-wrap">
+        <div class="question-text"><span class="question-number">16</span>Which section of the Support Form is the most critical to complete accurately?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q16" value="A"> A. The email field in Foster Information</label>
+          <label class="option-label"><input type="radio" name="q16" value="B"> B. The date and time stamp at the top</label>
+          <label class="option-label"><input type="radio" name="q16" value="C"> C. The Details of Support Request — the full, specific description of the situation</label>
+          <label class="option-label"><input type="radio" name="q16" value="D"> D. The Source dropdown</label>
+        </div>
+        <div class="error-msg" id="q16-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q17-wrap">
+        <div class="question-text"><span class="question-number">17</span>What should the Details of Support Request section contain?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q17" value="A"> A. Your professional opinion and assessment of what might be wrong</label>
+          <label class="option-label"><input type="radio" name="q17" value="B"> B. A medical diagnosis based on the symptoms described</label>
+          <label class="option-label"><input type="radio" name="q17" value="C"> C. Only what the foster actually shared — specific observations, symptoms, and timeline, in the foster's own words</label>
+          <label class="option-label"><input type="radio" name="q17" value="D"> D. A brief summary using medical terminology for clarity</label>
+        </div>
+        <div class="error-msg" id="q17-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q18-wrap">
+        <div class="question-text"><span class="question-number">18</span>Animal ID is a required field on the form, but the foster does not know their animal's ID. What should you do?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q18" value="A"> A. Leave the field blank and submit anyway</label>
+          <label class="option-label"><input type="radio" name="q18" value="B"> B. Enter a random number as a placeholder</label>
+          <label class="option-label"><input type="radio" name="q18" value="C"> C. Ask the foster if they have it; if not, note it was unavailable and flag it for the coordinator to locate</label>
+          <label class="option-label"><input type="radio" name="q18" value="D"> D. Cancel the form and create a manual entry in CCM instead</label>
+        </div>
+        <div class="error-msg" id="q18-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q19-wrap">
+        <div class="question-text"><span class="question-number">19</span>After submitting the Support Form, the case in CCM shows the foster's name as 'Name Not Listed.' What should you do?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q19" value="A"> A. Ignore it — it will be corrected automatically by the system</label>
+          <label class="option-label"><input type="radio" name="q19" value="B"> B. Leave it as-is since the other details are accurate</label>
+          <label class="option-label"><input type="radio" name="q19" value="C"> C. Go into CCM, locate the case, and update the name to the correct foster name</label>
+          <label class="option-label"><input type="radio" name="q19" value="D"> D. Ask ChatGPT for the correct name</label>
+        </div>
+        <div class="error-msg" id="q19-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q20-wrap">
+        <div class="question-text"><span class="question-number">20</span>What happens if required fields are left blank or filled with incomplete information?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q20" value="A"> A. The case processes faster because there is less data to review</label>
+          <label class="option-label"><input type="radio" name="q20" value="B"> B. No meaningful impact — the organization can work around it</label>
+          <label class="option-label"><input type="radio" name="q20" value="C"> C. The organization must stop and gather missing details before acting, causing delays in care</label>
+          <label class="option-label"><input type="radio" name="q20" value="D"> D. The system automatically fills in the missing fields</label>
+        </div>
+        <div class="error-msg" id="q20-err">Please select an answer.</div>
+      </div>
+    </div>
+
+    <!-- PART 4 -->
+    <div class="card">
+      <div class="section-header">Part 4: Dialpad — Communication &amp; Login (Questions 21–24)</div>
+
+      <div class="question" id="q21-wrap">
+        <div class="question-text"><span class="question-number">21</span>You are on a live call with a visibly distressed foster who has already begun explaining her animal's symptoms. You believe you recognize the issue from her opening sentence. What is the correct next action?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q21" value="A"> A. Provide your assessment and guidance immediately, since acting quickly reduces the foster's anxiety.</label>
+          <label class="option-label"><input type="radio" name="q21" value="B"> B. Continue listening without interrupting, then ask structured questions using the Support Form fields as your guide — do not offer guidance before you have the full picture.</label>
+          <label class="option-label"><input type="radio" name="q21" value="C"> C. Put the call on hold briefly to consult the Internal Chatbot and confirm your initial assessment before responding.</label>
+          <label class="option-label"><input type="radio" name="q21" value="D"> D. Ask the foster to send a text instead so you can document details more accurately before discussing.</label>
+        </div>
+        <div class="error-msg" id="q21-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q22-wrap">
+        <div class="question-text"><span class="question-number">22</span>When using KC Login for Dialpad, where is the one-time password (OTP) sent?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q22" value="A"> A. To your personal email address</label>
+          <label class="option-label"><input type="radio" name="q22" value="B"> B. To your Doobert Connect (DC) individual email</label>
+          <label class="option-label"><input type="radio" name="q22" value="C"> C. To the distribution list email — a shared team inbox</label>
+          <label class="option-label"><input type="radio" name="q22" value="D"> D. To your Mattermost direct messages</label>
+        </div>
+        <div class="error-msg" id="q22-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q23-wrap">
+        <div class="question-text"><span class="question-number">23</span>When using DC Login for Dialpad, where is the OTP sent?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q23" value="A"> A. To the distribution list email</label>
+          <label class="option-label"><input type="radio" name="q23" value="B"> B. To your personal email address</label>
+          <label class="option-label"><input type="radio" name="q23" value="C"> C. To your Doobert Connect (DC) individual email inbox</label>
+          <label class="option-label"><input type="radio" name="q23" value="D"> D. To CCM as a system notification</label>
+        </div>
+        <div class="error-msg" id="q23-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q24-wrap">
+        <div class="question-text"><span class="question-number">24</span>What is the most common mistake that causes delays when logging into Dialpad?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q24" value="A"> A. Asking a question in Mattermost before logging in</label>
+          <label class="option-label"><input type="radio" name="q24" value="B"> B. Checking the wrong inbox for the OTP — looking in the DC email when it went to the distribution list, or vice versa</label>
+          <label class="option-label"><input type="radio" name="q24" value="C"> C. Submitting a Support Form before logging in</label>
+          <label class="option-label"><input type="radio" name="q24" value="D"> D. Not setting your Mattermost status before accessing Dialpad</label>
+        </div>
+        <div class="error-msg" id="q24-err">Please select an answer.</div>
+      </div>
+    </div>
+
+    <!-- PART 5 -->
+    <div class="card">
+      <div class="section-header">Part 5: Mattermost — Operations &amp; Status Discipline (Questions 25–29)</div>
+
+      <div class="question" id="q25-wrap">
+        <div class="question-text"><span class="question-number">25</span>What must you do in Mattermost as soon as you log in for your shift?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q25" value="A"> A. Nothing — your status updates automatically</label>
+          <label class="option-label"><input type="radio" name="q25" value="B"> B. Set your status to Available and post a login message so the team knows you are on</label>
+          <label class="option-label"><input type="radio" name="q25" value="C"> C. Send an email to HR confirming your login</label>
+          <label class="option-label"><input type="radio" name="q25" value="D"> D. Close and reopen the application to refresh the channel list</label>
+        </div>
+        <div class="error-msg" id="q25-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q26-wrap">
+        <div class="question-text"><span class="question-number">26</span>What must you do in Mattermost when you log out at the end of your shift?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q26" value="A"> A. Simply close the browser tab</label>
+          <label class="option-label"><input type="radio" name="q26" value="B"> B. Leave your status as-is so the next agent can see you were online</label>
+          <label class="option-label"><input type="radio" name="q26" value="C"> C. Set your status to Offline and post a logout message including supports handled and any pending follow-ups</label>
+          <label class="option-label"><input type="radio" name="q26" value="D"> D. Send a message to the foster saying you are logging off</label>
+        </div>
+        <div class="error-msg" id="q26-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q27-wrap">
+        <div class="question-text"><span class="question-number">27</span>Why must notifications be turned ON in Mattermost throughout your entire shift?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q27" value="A"> A. They are needed to complete the visual design of the dashboard</label>
+          <label class="option-label"><input type="radio" name="q27" value="B"> B. So you do not miss critical mentions, escalations, task assignments, or urgent team messages directed at you</label>
+          <label class="option-label"><input type="radio" name="q27" value="C"> C. Notifications are optional but recommended for new team members</label>
+          <label class="option-label"><input type="radio" name="q27" value="D"> D. They are only needed when actively handling a live case</label>
+        </div>
+        <div class="error-msg" id="q27-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q28-wrap">
+        <div class="question-text"><span class="question-number">28</span>You are handling a case and you are genuinely unsure whether to classify it as Yellow or Red. What should you do?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q28" value="A"> A. Guess Yellow since it is the safer, lower option</label>
+          <label class="option-label"><input type="radio" name="q28" value="B"> B. Submit the form without a classification and let the coordinator decide</label>
+          <label class="option-label"><input type="radio" name="q28" value="C"> C. Ask in Mattermost before acting — get a second opinion from a team member</label>
+          <label class="option-label"><input type="radio" name="q28" value="D"> D. Submit immediately as Red without asking, since asking takes too long</label>
+        </div>
+        <div class="error-msg" id="q28-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q29-wrap">
+        <div class="question-text"><span class="question-number">29</span>You posted a message in Mattermost, and a team member tagged you with an urgent follow-up. You did not see it for 45 minutes. What most likely caused this?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q29" value="A"> A. The case was already closed so you stopped monitoring Mattermost</label>
+          <label class="option-label"><input type="radio" name="q29" value="B"> B. A system issue prevented the tag from appearing</label>
+          <label class="option-label"><input type="radio" name="q29" value="C"> C. Your Mattermost notifications were turned off, so you did not receive an alert</label>
+          <label class="option-label"><input type="radio" name="q29" value="D"> D. You were using the wrong tool for the shift</label>
+        </div>
+        <div class="error-msg" id="q29-err">Please select an answer.</div>
+      </div>
+    </div>
+
+    <!-- PART 6 -->
+    <div class="card">
+      <div class="section-header">Part 6: Email &amp; Communication (Questions 30–32)</div>
+
+      <div class="question" id="q30-wrap">
+        <div class="question-text"><span class="question-number">30</span>What must you ALWAYS do when sending any email from your Connect Email account?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q30" value="A"> A. CC the entire Doobert Connect team on the email</label>
+          <label class="option-label"><input type="radio" name="q30" value="B"> B. BCC the Doobert Connect distribution list on every outgoing email</label>
+          <label class="option-label"><input type="radio" name="q30" value="C"> C. Forward a copy to your personal email for your own records</label>
+          <label class="option-label"><input type="radio" name="q30" value="D"> D. Attach a copy of the Support Form to every email</label>
+        </div>
+        <div class="error-msg" id="q30-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q31-wrap">
+        <div class="question-text"><span class="question-number">31</span>When should you send a direct email to a Foster Coordinator?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q31" value="A"> A. Always, for every support interaction, before submitting the form</label>
+          <label class="option-label"><input type="radio" name="q31" value="B"> B. Never — email is only for foster communication</label>
+          <label class="option-label"><input type="radio" name="q31" value="C"> C. When the case is urgent, high-priority, or when the organization's Internal Site instructions specifically require it</label>
+          <label class="option-label"><input type="radio" name="q31" value="D"> D. Only after the case has been fully resolved</label>
+        </div>
+        <div class="error-msg" id="q31-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q32-wrap">
+        <div class="question-text"><span class="question-number">32</span>You need to send an update email that is addressed to the foster and copied to the Foster Coordinator. Which option correctly describes how to handle this single email?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q32" value="A"> A. Address the email to the foster, CC the Foster Coordinator, and BCC the Doobert Connect distribution list.</label>
+          <label class="option-label"><input type="radio" name="q32" value="B"> B. Address the email to the Foster Coordinator only — they will inform the foster directly.</label>
+          <label class="option-label"><input type="radio" name="q32" value="C"> C. BCC both the Foster Coordinator and the Doobert Connect distribution list, with the foster in the To field.</label>
+          <label class="option-label"><input type="radio" name="q32" value="D"> D. Send separate emails to the foster and the Foster Coordinator with no BCC, since double-BCCing would duplicate records.</label>
+        </div>
+        <div class="error-msg" id="q32-err">Please select an answer.</div>
+      </div>
+    </div>
+
+    <!-- PART 7 -->
+    <div class="card">
+      <div class="section-header">Part 7: Mighty Networks (Questions 33–35)</div>
+
+      <div class="question" id="q33-wrap">
+        <div class="question-text"><span class="question-number">33</span>You are supporting a DCC (Doobert Connect Complete) organization, which allows you to take a more active role in Mighty Networks. A foster posts about her dog showing signs of possible joint pain. Which action is still NOT permitted even under the DCC exception?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q33" value="A"> A. Acknowledging the post publicly and directing the foster to reach out through a proper support channel.</label>
+          <label class="option-label"><input type="radio" name="q33" value="B"> B. Sending the foster a direct message to gather more information before opening the Support Form.</label>
+          <label class="option-label"><input type="radio" name="q33" value="C"> C. Providing a detailed list of possible diagnoses and home care recommendations in the public comment thread.</label>
+          <label class="option-label"><input type="radio" name="q33" value="D"> D. Engaging more actively with the community by monitoring posts and initiating redirection conversations.</label>
+        </div>
+        <div class="error-msg" id="q33-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q34-wrap">
+        <div class="question-text"><span class="question-number">34</span>What is your primary role in Mighty Networks as a Foster Support team member?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q34" value="A"> A. To fully handle and resolve support cases in the public comment threads</label>
+          <label class="option-label"><input type="radio" name="q34" value="B"> B. To ignore all posts unless directly tagged by a foster</label>
+          <label class="option-label"><input type="radio" name="q34" value="C"> C. To monitor for situations that need support and redirect those fosters to the proper support channel</label>
+          <label class="option-label"><input type="radio" name="q34" value="D"> D. To post daily updates about case statuses for all fosters to see</label>
+        </div>
+        <div class="error-msg" id="q34-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q35-wrap">
+        <div class="question-text"><span class="question-number">35</span>When can you take a more active role in Mighty Networks, including more direct community engagement?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q35" value="A"> A. Always — you should be as active as possible in all org communities at all times</label>
+          <label class="option-label"><input type="radio" name="q35" value="B"> B. Never — your role is always observation only regardless of the organization</label>
+          <label class="option-label"><input type="radio" name="q35" value="C"> C. For DCC (Doobert Connect Complete) organizations, where your scope includes community engagement as part of the service</label>
+          <label class="option-label"><input type="radio" name="q35" value="D"> D. Only on weekends when call volume is lower and you have more time</label>
+        </div>
+        <div class="error-msg" id="q35-err">Please select an answer.</div>
+      </div>
+    </div>
+
+    <!-- PART 8 -->
+    <div class="card">
+      <div class="section-header">Part 8: ChatGPT &amp; Internal Chatbot (Questions 36–39)</div>
+
+      <div class="question" id="q36-wrap">
+        <div class="question-text"><span class="question-number">36</span>A foster asks you for the current clinic drop-off hours for their rescue organization. You are not sure if the hours have recently changed. What is the correct sequence of actions?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q36" value="A"> A. Ask ChatGPT for the hours, then email them to the foster.</label>
+          <label class="option-label"><input type="radio" name="q36" value="B"> B. Check the Internal Chatbot for a quick answer, then verify the result against the actual organization page on the Internal Site before communicating to the foster.</label>
+          <label class="option-label"><input type="radio" name="q36" value="C"> C. Look up the hours in CCM under the organization's case history, since this will have the most recent data.</label>
+          <label class="option-label"><input type="radio" name="q36" value="D"> D. Use ChatGPT to search online for the rescue's hours, since it has access to more current information than the Internal Site.</label>
+        </div>
+        <div class="error-msg" id="q36-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q37-wrap">
+        <div class="question-text"><span class="question-number">37</span>You ask the Internal Chatbot for a foster coordinator's contact email. It returns 'coordinator@sunriserescue.org.' When you navigate to the actual organization page on the Internal Site, it displays a different email address. What do you do?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q37" value="A"> A. Use the chatbot's email — it is built specifically for quick lookups and is more likely to be current.</label>
+          <label class="option-label"><input type="radio" name="q37" value="B"> B. Use whichever email seems to come from a more official domain.</label>
+          <label class="option-label"><input type="radio" name="q37" value="C"> C. Use the email from the Internal Site page and flag the discrepancy — the actual organization page is the authoritative source.</label>
+          <label class="option-label"><input type="radio" name="q37" value="D"> D. Ask in Mattermost which email is correct before sending anything.</label>
+        </div>
+        <div class="error-msg" id="q37-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q38-wrap">
+        <div class="question-text"><span class="question-number">38</span>Before sending or acting on any output from ChatGPT or the Internal Chatbot, what must you do?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q38" value="A"> A. Copy it directly — AI tools are reliable enough to use without review</label>
+          <label class="option-label"><input type="radio" name="q38" value="B"> B. Ignore it if it takes more than one minute to read</label>
+          <label class="option-label"><input type="radio" name="q38" value="C"> C. Review it carefully to ensure it aligns with your role, the Internal Site protocols, and clear communication standards</label>
+          <label class="option-label"><input type="radio" name="q38" value="D"> D. Delete it and start over with a different prompt</label>
+        </div>
+        <div class="error-msg" id="q38-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q39-wrap">
+        <div class="question-text"><span class="question-number">39</span>What is the biggest risk of using AI tools incorrectly?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q39" value="A"> A. Your responses will be slightly faster but may sound informal</label>
+          <label class="option-label"><input type="radio" name="q39" value="B"> B. Your replies will be shorter, which reduces documentation quality</label>
+          <label class="option-label"><input type="radio" name="q39" value="C"> C. The guidance or information sent to the foster may be incorrect, misaligned with protocols, or outside your role — causing confusion or harm</label>
+          <label class="option-label"><input type="radio" name="q39" value="D"> D. The case will be routed to the wrong coordinator in CCM</label>
+        </div>
+        <div class="error-msg" id="q39-err">Please select an answer.</div>
+      </div>
+    </div>
+
+    <!-- PART 9 -->
+    <div class="card">
+      <div class="section-header">Part 9: Scenario-Based Questions (Questions 40–42)</div>
+      <p class="section-subtitle">Read each scenario and choose the best response.</p>
+
+      <div class="question" id="q40-wrap">
+        <div class="question-text"><span class="question-number">40</span>A foster posts a message in Mighty Networks: "My cat has been vomiting all morning. Any advice?" What should you do?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q40" value="A"> A. Respond publicly in the comments with a full list of symptoms to watch for and advice on when to go to the vet</label>
+          <label class="option-label"><input type="radio" name="q40" value="B"> B. Ignore the post since it was not sent through a proper support channel</label>
+          <label class="option-label"><input type="radio" name="q40" value="C"> C. Briefly acknowledge the post and privately message the foster to move the conversation to the proper support workflow (Dialpad, email, or the Support Form)</label>
+          <label class="option-label"><input type="radio" name="q40" value="D"> D. Close the case in CCM since no form was submitted</label>
+        </div>
+        <div class="error-msg" id="q40-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q41-wrap">
+        <div class="question-text"><span class="question-number">41</span>You submitted a Support Form for a foster concern. What should you do immediately after submitting?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q41" value="A"> A. Send the foster a confirmation email and mark the interaction complete</label>
+          <label class="option-label"><input type="radio" name="q41" value="B"> B. Go to CCM and verify that the case was created, that all details are accurate, and that the foster name is not listed as 'Name Not Listed'</label>
+          <label class="option-label"><input type="radio" name="q41" value="C"> C. Use ChatGPT to summarize the case for your records</label>
+          <label class="option-label"><input type="radio" name="q41" value="D"> D. Send a Mattermost message announcing the case submission to the entire team</label>
+        </div>
+        <div class="error-msg" id="q41-err">Please select an answer.</div>
+      </div>
+
+      <div class="question" id="q42-wrap">
+        <div class="question-text"><span class="question-number">42</span>What is the most significant tool-related mistake a Foster Support team member can make?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q42" value="A"> A. Asking a clarifying question in Mattermost before acting on a case</label>
+          <label class="option-label"><input type="radio" name="q42" value="B"> B. Using the wrong tool for a task or skipping a step in the workflow entirely</label>
+          <label class="option-label"><input type="radio" name="q42" value="C"> C. Opening the Support Form too early in the conversation</label>
+          <label class="option-label"><input type="radio" name="q42" value="D"> D. Checking the Internal Site instructions before submitting a form</label>
+        </div>
+        <div class="error-msg" id="q42-err">Please select an answer.</div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="card">
+      <p class="submit-hint">Review all your answers before submitting. You can change any answer until you click Submit.</p>
+      <button type="submit" class="btn-submit" id="submitBtn">Submit Assessment</button>
+      <div class="submission-status" id="submissionStatus"></div>
+    </div>
+
+  </form>
+
+  <!-- Results -->
+  <div class="results-card" id="resultsCard">
+    <p class="results-module-label">Module 2 Assessment Result</p>
+    <div class="score-display" id="scoreDisplay"></div>
+    <p class="score-total">out of 42</p>
+    <div class="verdict" id="verdictText"></div>
+    <p class="results-note" id="resultsNote"></p>
+    <button class="btn-retake" id="retakeBtn" style="display:none;" onclick="location.reload()">↺ Retake Assessment</button>
+  </div>
+
+</div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4s-rvKghwg6PFtvQHzNwq-IK70NhHWlt-jMSMWyIyd4st7kqeMkJjc5GOlXScjqO8vA/exec';
+
+  const ANSWER_KEY = {
+    q1:'B',  q2:'C',  q3:'B',  q4:'B',  q5:'B',
+    q6:'B',  q7:'B',  q8:'B',  q9:'C',  q10:'C',
+    q11:'B', q12:'C', q13:'B', q14:'C', q15:'B',
+    q16:'C', q17:'C', q18:'C', q19:'C', q20:'C',
+    q21:'B', q22:'C', q23:'C', q24:'B',
+    q25:'B', q26:'C', q27:'B', q28:'C', q29:'C',
+    q30:'B', q31:'C', q32:'A',
+    q33:'C', q34:'C', q35:'C',
+    q36:'B', q37:'C', q38:'C', q39:'C',
+    q40:'C', q41:'B', q42:'B'
+  };
+
+  const TOTAL = 42;
+  const PASS_SCORE = 34;
+
+  document.querySelectorAll('.options').forEach(group => {
+    group.querySelectorAll('input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        group.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+        radio.closest('.option-label').classList.add('selected');
+        const errEl = document.getElementById(radio.name + '-err');
+        if (errEl) errEl.style.display = 'none';
+      });
+    });
+  });
+
+  document.getElementById('assessmentDate').valueAsDate = new Date();
+
+  document.getElementById('assessmentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let valid = true;
+
+    const name = document.getElementById('traineeName').value.trim();
+    if (!name) {
+      document.getElementById('nameError').style.display = 'block';
+      document.getElementById('traineeName').classList.add('field-error');
+      valid = false;
+    } else {
+      document.getElementById('nameError').style.display = 'none';
+      document.getElementById('traineeName').classList.remove('field-error');
+    }
+
+    const date = document.getElementById('assessmentDate').value;
+    if (!date) {
+      document.getElementById('dateError').style.display = 'block';
+      document.getElementById('assessmentDate').classList.add('field-error');
+      valid = false;
+    } else {
+      document.getElementById('dateError').style.display = 'none';
+      document.getElementById('assessmentDate').classList.remove('field-error');
+    }
+
+    const answers = {};
+    for (let i = 1; i <= TOTAL; i++) {
+      const qName = 'q' + i;
+      const sel   = document.querySelector(`input[name="${qName}"]:checked`);
+      const errEl = document.getElementById(qName + '-err');
+      if (!sel) {
+        errEl.style.display = 'block';
+        if (valid) document.getElementById(qName + '-wrap').scrollIntoView({behavior:'smooth', block:'center'});
+        valid = false;
+      } else {
+        if (errEl) errEl.style.display = 'none';
+        answers[qName] = sel.value;
+      }
+    }
+
+    if (!valid) return;
+
+    let score = 0;
+    for (const [q, correct] of Object.entries(ANSWER_KEY)) {
+      if (answers[q] === correct) score++;
+    }
+    const passed     = score >= PASS_SCORE;
+    const percentage = Math.round((score / TOTAL) * 100);
+
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled    = true;
+    submitBtn.textContent = 'Submitting…';
+
+    const statusEl = document.getElementById('submissionStatus');
+    statusEl.className   = 'submission-status sending';
+    statusEl.textContent = '⏳ Sending your results…';
+
+    const payload = {
+      module: 'Module 2', name, date,
+      timestamp: new Date().toISOString(),
+      quiz_score: score, quiz_total: TOTAL,
+      percentage, result: passed ? 'Pass' : 'Retake',
+      ...answers
+    };
+
+    try {
+      await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      statusEl.className   = 'submission-status sent';
+      statusEl.textContent = '✅ Results submitted successfully!';
+    } catch {
+      statusEl.className   = 'submission-status failed';
+      statusEl.textContent = '⚠️ Submission failed — your score is shown below. Please notify your supervisor.';
+    }
+
+    setTimeout(() => {
+      document.getElementById('assessmentForm').style.display = 'none';
+      const card = document.getElementById('resultsCard');
+      card.style.display = 'block';
+      card.className     = 'results-card ' + (passed ? 'pass' : 'retake');
+      const scoreEl = document.getElementById('scoreDisplay');
+      scoreEl.textContent = score;
+      scoreEl.className   = 'score-display ' + (passed ? 'pass' : 'retake');
+      const verdict = document.getElementById('verdictText');
+      verdict.className   = 'verdict ' + (passed ? 'pass' : 'retake');
+      if (passed) {
+        verdict.textContent = '✓ Pass — Module 3 Unlocked';
+        document.getElementById('resultsNote').textContent =
+          `Great work, ${name}! You scored ${score}/42 (${percentage}%). You may now proceed to Module 3 and access the DC Tools Quick-Reference Cheat Sheet.`;
+      } else {
+        verdict.textContent = '↺ Retake Required';
+        document.getElementById('resultsNote').textContent =
+          `You scored ${score}/42 (${percentage}%). A score of 34/42 (80%) is required to proceed. Please review the module content and retake when ready.`;
+        document.getElementById('retakeBtn').style.display = 'inline-block';
+      }
+      card.scrollIntoView({ behavior: 'smooth' });
+    }, 1600);
+  });
+</script>
+</body>
+</html>
