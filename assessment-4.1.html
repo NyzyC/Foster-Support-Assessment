@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 4 Assessment — Doobert Connect</title>
+  <style>
+    :root {
+      --orange: #E8640A; --orange-dark: #C8540A;
+      --teal: #2E7D8C;   --teal-dark: #235F6E;
+      --purple: #5A3E8A; --purple-dark: #45306E;
+      --light-orange: #FFF4ED; --light-teal: #E8F4F6;
+      --text: #2C2C2C;   --text-light: #666;
+      --border: #D9D9D9; --success: #2E7D52; --danger: #C0392B; --bg: #F5F5F5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 800px; margin: 0 auto; padding: 32px 16px 48px; }
+    .header { background: var(--orange); color: white; padding: 28px 32px; border-radius: 10px 10px 0 0; }
+    .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+    .header p  { font-size: 14px; opacity: 0.9; }
+    .card { background: white; border-radius: 8px; padding: 28px 32px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .card-first { border-radius: 0 0 8px 8px; margin-top: 0; }
+    .info-box { background: var(--light-orange); border-left: 4px solid var(--orange); padding: 16px 20px; border-radius: 0 6px 6px 0; margin-top: 4px; }
+    .info-box h3 { color: var(--orange); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+    .info-box p { font-size: 14px; margin-bottom: 6px; }
+    .info-box p:last-child { margin-bottom: 0; }
+
+    /* Priority legend */
+    .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .legend-item { flex: 1 1 150px; border-radius: 6px; padding: 9px 13px; font-size: 13px; font-weight: 600; border: 2px solid transparent; }
+    .legend-blue   { background: #e8f0fe; border-color: #4285f4; color: #1a56a0; }
+    .legend-green  { background: #e6f4ea; border-color: #34a853; color: #1e7e34; }
+    .legend-yellow { background: #fef9e7; border-color: #f9ab00; color: #9c6900; }
+    .legend-red    { background: #fce8e6; border-color: #ea4335; color: #a50000; }
+    .legend-item span { display: block; font-weight: 400; font-size: 12px; margin-top: 2px; }
+
+    .trainee-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--teal); margin-bottom: 5px; }
+    input[type="text"], input[type="date"] { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--text); transition: border-color 0.2s; }
+    input[type="text"]:focus, input[type="date"]:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(46,125,140,0.12); }
+    .field-error { border-color: var(--danger) !important; }
+    .section-header { color: white; padding: 11px 20px; border-radius: 6px; margin-bottom: 6px; font-size: 15px; font-weight: 600; }
+    .section-header.teal   { background: var(--teal); }
+    .section-header.purple { background: var(--purple); }
+    .section-subtitle { font-size: 13px; color: var(--text-light); margin-bottom: 24px; padding-left: 2px; }
+    .new-badge { display: inline-block; background: var(--purple); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle; letter-spacing: 0.03em; }
+
+    .question { margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid #F0F0F0; }
+    .question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .question-text { font-size: 14.5px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.55; display: flex; align-items: flex-start; gap: 10px; }
+    .question-number { display: inline-flex; align-items: center; justify-content: center; background: var(--orange); color: white; min-width: 26px; height: 26px; border-radius: 50%; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .options { display: flex; flex-direction: column; gap: 8px; }
+    .option-label { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 14px; line-height: 1.5; transition: border-color 0.15s, background 0.15s; user-select: none; }
+    .option-label:hover { border-color: var(--teal); background: var(--light-teal); }
+    .option-label.selected { border-color: var(--teal); background: var(--light-teal); }
+    .option-label input[type="radio"] { margin-top: 3px; flex-shrink: 0; accent-color: var(--teal); cursor: pointer; }
+
+    /* Color-coded left border per priority */
+    .opt-blue   { border-left: 4px solid #4285f4 !important; }
+    .opt-green  { border-left: 4px solid #34a853 !important; }
+    .opt-yellow { border-left: 4px solid #f9ab00 !important; }
+    .opt-red    { border-left: 4px solid #ea4335 !important; }
+
+    .error-msg { color: var(--danger); font-size: 12.5px; margin-top: 6px; display: none; }
+    .btn-submit { display: block; width: 100%; padding: 16px; background: var(--orange); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 0.3px; transition: background 0.2s; font-family: inherit; }
+    .btn-submit:hover:not(:disabled) { background: var(--orange-dark); }
+    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+    .submit-hint { font-size: 13px; color: var(--text-light); text-align: center; margin-bottom: 14px; }
+    .submission-status { text-align: center; padding: 11px 16px; border-radius: 6px; font-size: 14px; margin-top: 12px; display: none; }
+    .submission-status.sending { background: var(--light-teal); color: var(--teal); display: block; }
+    .submission-status.sent    { background: #EDF7ED; color: var(--success); display: block; }
+    .submission-status.failed  { background: #FDE8E6; color: var(--danger); display: block; }
+    .results-card { display: none; background: white; border-radius: 10px; padding: 44px 32px 36px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.09); }
+    .results-card.pass   { border-top: 6px solid var(--success); }
+    .results-card.retake { border-top: 6px solid var(--danger); }
+    .results-module-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: #aaa; margin-bottom: 8px; }
+    .score-display { font-size: 72px; font-weight: 800; line-height: 1; margin: 6px 0 4px; }
+    .score-display.pass   { color: var(--success); }
+    .score-display.retake { color: var(--danger); }
+    .score-total { font-size: 18px; color: #aaa; margin-bottom: 14px; }
+    .verdict { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+    .verdict.pass   { color: var(--success); }
+    .verdict.retake { color: var(--danger); }
+    .results-note { font-size: 14px; color: var(--text-light); max-width: 500px; margin: 0 auto 28px; line-height: 1.75; }
+    .btn-retake { display: inline-block; padding: 12px 32px; background: var(--teal); color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .btn-retake:hover { background: var(--teal-dark); }
+    @media (max-width: 600px) { .trainee-grid { grid-template-columns: 1fr; } .card { padding: 20px 16px; } .score-display { font-size: 56px; } .legend-item { flex: 1 1 130px; } }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Module 4 Assessment</h1>
+    <p>Doobert Connect Foster Support Training</p>
+  </div>
+
+  <div class="card card-first">
+    <div class="info-box">
+      <h3>Before You Begin — Read This</h3>
+      <p>Complete this assessment independently. Do not check the answer key until you have answered all 30 questions.</p>
+      <p><strong>A score of 80% or higher (24 out of 30) is required to proceed to Module 5.</strong></p>
+      <p>Each question presents a foster report. Assign the correct priority level: Blue, Green, Yellow, or Red. Small details — frequency, severity, and behavior changes — determine the right answer.</p>
+      <p>Part 2 (Questions 21–30) contains extended edge scenarios marked <span class="new-badge">★ NEW</span>.</p>
+    </div>
+    <div class="legend">
+      <div class="legend-item legend-blue">🔵 Blue — Routine<span>No vet needed; normal variation</span></div>
+      <div class="legend-item legend-green">🟢 Green — Monitor<span>Watch closely; possible vet 48–72 hrs</span></div>
+      <div class="legend-item legend-yellow">🟡 Yellow — Needs Attention<span>Vet visit within 24–48 hrs</span></div>
+      <div class="legend-item legend-red">🔴 Red — Urgent<span>See a vet ASAP</span></div>
+    </div>
+  </div>
+
+  <form id="assessmentForm" novalidate>
+
+    <!-- Trainee Info -->
+    <div class="card">
+      <h2 style="color:var(--teal);font-size:16px;margin-bottom:4px;">Trainee Information</h2>
+      <div class="trainee-grid">
+        <div>
+          <label for="traineeName">Full Name *</label>
+          <input type="text" id="traineeName" placeholder="Your full name" required autocomplete="name">
+          <div class="error-msg" id="nameError">Please enter your full name.</div>
+        </div>
+        <div>
+          <label for="assessmentDate">Date *</label>
+          <input type="date" id="assessmentDate" required>
+          <div class="error-msg" id="dateError">Please select a date.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PART 1 ===== -->
+    <div class="card">
+      <div class="section-header teal">Part 1: Original Cases (Questions 1–20)</div>
+      <p class="section-subtitle">For each scenario, assign the correct priority level.</p>
+
+      <!-- Q1 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">1</span>Dog vomited once this morning, is now eating lunch and playing normally.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q1" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q1" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q1" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q1" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q1Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">2</span>Dog has had diarrhea 3 times today. Still eating and active, no lethargy.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q2" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q2" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q2" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q2" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q2Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">3</span>Dog is very weak, refusing all food, barely lifting its head.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q3" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q3" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q3" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q3" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q3Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">4</span>Mild coughing on and off today, normal energy, eating well.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q4" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q4" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q4" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q4" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q4Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">5</span>Vomited 4 times today, eating very little, noticeably quieter than usual.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q5" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q5" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q5" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q5" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q5Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">6</span>Dog skipped breakfast but ate all of dinner. Still playful and energetic all day.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q6" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q6" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q6" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q6" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q6Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">7</span>Limping slightly on the right front leg after running outside. Still running, eating, and behaving normally.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q7" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q7" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q7" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q7" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q7Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">8</span>Diarrhea all day, seems tired and less interested in playing.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q8" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q8" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q8" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q8" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q8Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">9</span>Foster reports the cat is struggling to breathe — open-mouth breathing and labored chest movement.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q9" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q9" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q9" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q9" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q9Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">10</span>Occasional sneezing this morning — three or four times — no nasal discharge, eating normally, fully active.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q10" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q10" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q10" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q10" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q10Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">11</span>Reduced appetite for 2 days but still eating some. Still active and behaving normally otherwise.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q11" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q11" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q11" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q11" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q11Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">12</span>Vomited twice this morning and now has noticeably reduced energy. Ate a small amount at lunch.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q12" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q12" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q12" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q12" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q12Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q13 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">13</span>Foster says the cat suddenly collapsed on its side and is not getting up.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q13" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q13" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q13" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q13" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q13Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q14 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">14</span>Mild scratching around the ears occasionally. No visible irritation or hair loss. Fully active and eating.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q14" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q14" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q14" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q14" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q14Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q15 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">15</span>Limping noticeably when walking — favoring the leg consistently even after resting. Still eating but moving slower.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q15" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q15" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q15" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q15" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q15Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q16 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">16</span>Not eating at all since yesterday morning. Very lethargic, just sleeping. Not interested in interacting.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q16" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q16" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q16" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q16" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q16Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q17 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">17</span>Mild diarrhea once this afternoon. Still eating, drinking, active, and behaving normally.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q17" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q17" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q17" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q17" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q17Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q18 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">18</span>Coughing on and off for 2 days. Still active and eating well, but the coughing has not improved.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q18" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q18" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q18" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q18" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q18Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q19 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">19</span>Vomited 3–4 times this evening. Now quiet and not interested in moving around. Has not eaten since this morning.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q19" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q19" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q19" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q19" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q19Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q20 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">20</span>Severe injury: dog was hit by a car. Visible wounds, cannot bear weight on one leg, crying in pain.</div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q20" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q20" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q20" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q20" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q20Error">Please select an answer.</div>
+      </div>
+
+    </div><!-- /card part 1 -->
+
+    <!-- ===== PART 2 ===== -->
+    <div class="card">
+      <div class="section-header purple">Part 2: Extended Cases &amp; Edge Scenarios (Questions 21–30) <span class="new-badge">★ NEW</span></div>
+      <p class="section-subtitle">Apply what you know — these scenarios test edge cases and nuanced judgment.</p>
+
+      <!-- Q21 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">21</span>3-week-old kitten has not eaten in 6 hours, feels cold to the touch, and is barely moving. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q21" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q21" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q21" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q21" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q21Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q22 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">22</span>Dog had a seizure lasting about 30 seconds. It has now stopped. The dog is standing but seems disoriented and confused. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q22" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q22" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q22" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q22" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q22Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q23 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">23</span>Foster reports the cat's face and muzzle have become suddenly swollen within the last hour. No known injury. Cat is awake but restless. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q23" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q23" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q23" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q23" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q23Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q24 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">24</span>Dog has been vomiting continuously for over an hour. Foster says it will not stop — the dog retches even when there is nothing left. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q24" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q24" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q24" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q24" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q24Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q25 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">25</span>Foster says the dog "just isn't quite himself today" — slightly less playful than usual. Still eating, drinking, and showing no visible symptoms. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q25" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q25" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q25" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q25" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q25Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q26 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">26</span>Cat has had mild nasal discharge and sneezes several times a day for the past 2 days. Still eating normally and fully active. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q26" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q26" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q26" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q26" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q26Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q27 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">27</span>Dog has been scratching both ears persistently for 2 days. Foster notices dark debris inside one ear and the dog frequently shakes its head. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q27" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q27" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q27" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q27" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q27Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q28 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">28</span>Dog vomited once in the morning and seemed fine afterward. Then vomited again in the late afternoon. Currently resting and has not eaten dinner. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q28" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q28" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q28" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q28" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q28Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q29 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">29</span>Cat has completely refused food for 36 hours. Still drinking water. Noticeably less active — spending most of the time in one spot — but responds when the foster approaches. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q29" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q29" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q29" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q29" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q29Error">Please select an answer.</div>
+      </div>
+
+      <!-- Q30 -->
+      <div class="question">
+        <div class="question-text"><span class="question-number">30</span>Dog is limping severely on the front right leg — crying when the leg is touched, unable to put any weight on it at all. Injury happened within the last hour. <span class="new-badge">★ NEW</span></div>
+        <div class="options">
+          <label class="option-label opt-blue"><input type="radio" name="q30" value="A"> A. Blue — Routine, no vet needed</label>
+          <label class="option-label opt-green"><input type="radio" name="q30" value="B"> B. Green — Monitor closely, possible vet 48–72 hrs</label>
+          <label class="option-label opt-yellow"><input type="radio" name="q30" value="C"> C. Yellow — Needs attention, vet 24–48 hrs</label>
+          <label class="option-label opt-red"><input type="radio" name="q30" value="D"> D. Red — Urgent, vet ASAP</label>
+        </div>
+        <div class="error-msg" id="q30Error">Please select an answer.</div>
+      </div>
+
+    </div><!-- /card part 2 -->
+
+    <!-- Submit -->
+    <div class="card">
+      <p class="submit-hint">Review your answers, then click Submit to record your results.</p>
+      <button type="submit" class="btn-submit" id="submitBtn">Submit Assessment</button>
+      <div class="submission-status" id="submissionStatus"></div>
+    </div>
+
+  </form>
+
+  <!-- Results card -->
+  <div class="results-card" id="resultsCard">
+    <div class="results-module-label">Module 4 Assessment</div>
+    <div class="score-display" id="scoreDisplay"></div>
+    <div class="score-total" id="scoreTotal"></div>
+    <div class="verdict" id="verdictText"></div>
+    <p class="results-note" id="resultsNote"></p>
+    <button class="btn-retake" onclick="location.reload()">Retake Assessment</button>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4s-rvKghwg6PFtvQHzNwq-IK70NhHWlt-jMSMWyIyd4st7kqeMkJjc5GOlXScjqO8vA/exec';
+  const TOTAL = 30;
+  const PASS_SCORE = 24;
+
+  const ANSWER_KEY = {
+    q1:'A',  q2:'B',  q3:'D',  q4:'B',  q5:'C',
+    q6:'A',  q7:'B',  q8:'C',  q9:'D',  q10:'A',
+    q11:'B', q12:'C', q13:'D', q14:'A', q15:'C',
+    q16:'D', q17:'A', q18:'B', q19:'C', q20:'D',
+    q21:'D', q22:'D', q23:'D', q24:'D', q25:'B',
+    q26:'B', q27:'C', q28:'B', q29:'C', q30:'D'
+  };
+
+  // Auto-fill today's date
+  document.getElementById('assessmentDate').value = new Date().toISOString().slice(0, 10);
+
+  // Highlight selected option + clear per-question error
+  document.querySelectorAll('.option-label input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const name = radio.name;
+      document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+        r.closest('.option-label').classList.toggle('selected', r.checked);
+      });
+      const errEl = document.getElementById(name + 'Error');
+      if (errEl) errEl.style.display = 'none';
+    });
+  });
+
+  document.getElementById('assessmentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let valid = true;
+
+    const name = document.getElementById('traineeName').value.trim();
+    const date = document.getElementById('assessmentDate').value;
+
+    if (!name) {
+      document.getElementById('traineeName').classList.add('field-error');
+      document.getElementById('nameError').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('traineeName').classList.remove('field-error');
+      document.getElementById('nameError').style.display = 'none';
+    }
+
+    if (!date) {
+      document.getElementById('assessmentDate').classList.add('field-error');
+      document.getElementById('dateError').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('assessmentDate').classList.remove('field-error');
+      document.getElementById('dateError').style.display = 'none';
+    }
+
+    const answers = {};
+    for (let i = 1; i <= TOTAL; i++) {
+      const key = 'q' + i;
+      const sel = document.querySelector(`input[name="${key}"]:checked`);
+      answers[key] = sel ? sel.value : null;
+      if (!sel) {
+        document.getElementById(key + 'Error').style.display = 'block';
+        valid = false;
+      }
+    }
+
+    if (!valid) {
+      const firstErr = document.querySelector('.error-msg[style*="block"]');
+      if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Score
+    let score = 0;
+    for (let i = 1; i <= TOTAL; i++) {
+      const key = 'q' + i;
+      if (answers[key] === ANSWER_KEY[key]) score++;
+    }
+
+    const percentage = Math.round((score / TOTAL) * 100);
+    const passed = score >= PASS_SCORE;
+    const timestamp = new Date().toISOString();
+
+    const payload = {
+      module: 'Module 4',
+      name,
+      date,
+      timestamp,
+      quiz_score: score,
+      quiz_total: TOTAL,
+      percentage,
+      result: passed ? 'Pass' : 'Retake',
+      ...answers
+    };
+
+    const statusEl = document.getElementById('submissionStatus');
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    statusEl.className = 'submission-status sending';
+    statusEl.textContent = 'Submitting your assessment…';
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      statusEl.className = 'submission-status sent';
+      statusEl.textContent = '✓ Assessment submitted successfully.';
+    } catch (err) {
+      statusEl.className = 'submission-status failed';
+      statusEl.textContent = 'Submission error. Please try again or contact your supervisor.';
+      submitBtn.disabled = false;
+      return;
+    }
+
+    // Show results
+    setTimeout(() => {
+      document.getElementById('assessmentForm').style.display = 'none';
+      const card = document.getElementById('resultsCard');
+      card.style.display = 'block';
+      card.className = 'results-card ' + (passed ? 'pass' : 'retake');
+
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      scoreDisplay.textContent = score;
+      scoreDisplay.className = 'score-display ' + (passed ? 'pass' : 'retake');
+
+      document.getElementById('scoreTotal').textContent = '/ ' + TOTAL + ' (' + percentage + '%)';
+
+      const verdict = document.getElementById('verdictText');
+      verdict.className = 'verdict ' + (passed ? 'pass' : 'retake');
+      verdict.textContent = passed ? '✓ Pass' : '✗ Retake Required';
+
+      const note = document.getElementById('resultsNote');
+      if (passed) {
+        note.textContent = 'Great work, ' + name + '! You\'ve passed Module 4. You may now proceed to Module 5.';
+      } else {
+        note.textContent = 'You scored ' + score + ' out of ' + TOTAL + '. A score of ' + PASS_SCORE + ' or higher is required to pass. Please review the priority classification guide and retake when ready.';
+      }
+
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 800);
+  });
+</script>
+</body>
+</html>
