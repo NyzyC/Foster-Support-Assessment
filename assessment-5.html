@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 5 Assessment — Doobert Connect</title>
+  <style>
+    :root {
+      --orange: #E8640A; --orange-dark: #C8540A;
+      --teal: #2E7D8C;   --teal-dark: #235F6E;
+      --light-orange: #FFF4ED; --light-teal: #E8F4F6;
+      --text: #2C2C2C;   --text-light: #666;
+      --border: #D9D9D9; --success: #2E7D52; --danger: #C0392B; --bg: #F5F5F5;
+      --model-bg: #F0F7F0; --model-border: #2E7D52;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 820px; margin: 0 auto; padding: 32px 16px 48px; }
+    .header { background: var(--orange); color: white; padding: 28px 32px; border-radius: 10px 10px 0 0; }
+    .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+    .header p  { font-size: 14px; opacity: 0.9; }
+    .card { background: white; border-radius: 8px; padding: 28px 32px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .card-first { border-radius: 0 0 8px 8px; margin-top: 0; }
+    .info-box { background: var(--light-orange); border-left: 4px solid var(--orange); padding: 16px 20px; border-radius: 0 6px 6px 0; }
+    .info-box h3 { color: var(--orange); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+    .info-box p { font-size: 14px; margin-bottom: 6px; }
+    .info-box p:last-child { margin-bottom: 0; }
+    .trainee-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--teal); margin-bottom: 5px; }
+    input[type="text"], input[type="date"] { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--text); transition: border-color 0.2s; }
+    input[type="text"]:focus, input[type="date"]:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(46,125,140,0.12); }
+    .field-error-input { border-color: var(--danger) !important; }
+    .error-msg { color: var(--danger); font-size: 12.5px; margin-top: 6px; display: none; }
+
+    /* Scenario card */
+    .scenario-card { background: white; border-radius: 8px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; }
+    .scenario-header { padding: 16px 24px; color: white; }
+    .scenario-header .scenario-label { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; margin-bottom: 4px; font-weight: 600; }
+    .scenario-header .foster-quote { font-size: 17px; font-weight: 700; font-style: italic; }
+    .scenario-body { padding: 24px; }
+
+    /* Response section */
+    .response-section { margin-bottom: 16px; }
+    .response-section h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--teal); margin-bottom: 12px; border-bottom: 1px solid #EEE; padding-bottom: 8px; }
+    .field-group { margin-bottom: 14px; }
+    .field-group label { font-size: 13px; font-weight: 600; color: var(--teal); margin-bottom: 5px; }
+    .field-group textarea { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--text); resize: vertical; transition: border-color 0.2s, background 0.2s; line-height: 1.55; min-height: 90px; }
+    .field-group textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(46,125,140,0.12); }
+    .field-group textarea.locked { background: #F9F9F9; color: #555; border-color: #E0E0E0; cursor: not-allowed; resize: none; }
+    .field-group textarea.field-error-ta { border-color: var(--danger) !important; }
+
+    /* Lock button row */
+    .lock-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .btn-lock { padding: 10px 22px; background: var(--teal); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; white-space: nowrap; }
+    .btn-lock:hover { background: var(--teal-dark); }
+    .lock-warning { font-size: 13px; color: var(--danger); display: none; }
+    .locked-badge { display: none; align-items: center; gap: 8px; background: #EDF7ED; border: 1px solid #a8d5b0; border-radius: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--success); }
+    .locked-badge svg { flex-shrink: 0; }
+
+    /* Reveal button */
+    .btn-reveal { display: none; width: 100%; margin-bottom: 20px; padding: 11px 20px; background: white; color: var(--model-border); border: 2px solid var(--model-border); border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s, color 0.2s; text-align: center; }
+    .btn-reveal:hover { background: var(--model-bg); }
+    .btn-reveal.revealed { background: var(--model-border); color: white; }
+
+    /* Model answer */
+    .model-answer { display: none; background: var(--model-bg); border: 1px solid #c3dfc3; border-radius: 8px; padding: 20px 24px; margin-bottom: 20px; }
+    .model-answer h4 { color: var(--model-border); font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+    .model-section { margin-bottom: 14px; }
+    .model-section-title { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 6px; }
+    .model-answer ul { padding-left: 18px; margin-top: 4px; }
+    .model-answer li { font-size: 13.5px; margin-bottom: 5px; line-height: 1.5; }
+    .model-answer .next-step { background: white; border-left: 3px solid var(--model-border); padding: 10px 14px; border-radius: 0 4px 4px 0; font-size: 13.5px; line-height: 1.6; }
+    .escalate-list li { color: var(--danger); }
+    .sw-table { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .sw-col { border-radius: 6px; padding: 12px 14px; }
+    .sw-strong { background: #e6f4ea; }
+    .sw-weak   { background: #fce8e6; }
+    .sw-col h5 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .sw-strong h5 { color: var(--success); }
+    .sw-weak   h5 { color: var(--danger); }
+    .sw-col ul { padding-left: 16px; }
+    .sw-col li { font-size: 12.5px; margin-bottom: 4px; line-height: 1.45; }
+    .sw-strong li { color: #1a5e36; }
+    .sw-weak   li { color: #8b1a1a; }
+
+    /* Rubric */
+    .rubric-section { background: #FAFAFA; border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; display: none; }
+    .rubric-section.visible { display: block; }
+    .rubric-section h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--orange); margin-bottom: 4px; }
+    .rubric-section .rubric-hint { font-size: 12.5px; color: var(--text-light); margin-bottom: 14px; }
+    .rubric-row { display: flex; align-items: flex-start; gap: 14px; padding: 10px 0; border-bottom: 1px solid #EEE; }
+    .rubric-row:last-of-type { border-bottom: none; }
+    .rubric-num { display: inline-flex; align-items: center; justify-content: center; background: var(--orange); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .rubric-criterion { flex: 1; font-size: 13.5px; line-height: 1.5; }
+    .rubric-options { display: flex; gap: 16px; flex-shrink: 0; padding-top: 2px; }
+    .rubric-options label { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; }
+    .rubric-options input[type="radio"] { accent-color: var(--teal); }
+    .score-pill { margin-top: 14px; text-align: center; padding: 10px; border-radius: 6px; font-weight: 700; font-size: 15px; background: #F0F0F0; color: #888; transition: background 0.3s, color 0.3s; }
+    .score-excellent { background: #e6f4ea; color: var(--success); }
+    .score-pass      { background: #e6f4ea; color: #2a6e47; }
+    .score-review    { background: #fef9e7; color: #9c6900; }
+    .score-retake    { background: #fce8e6; color: var(--danger); }
+
+    /* Overall tracker */
+    .overall-tracker { text-align: center; background: var(--light-teal); border: 1px solid #a0c8d0; border-radius: 8px; padding: 18px; margin-bottom: 20px; }
+    .overall-tracker .tracker-label { font-size: 13px; color: var(--teal); font-weight: 600; margin-bottom: 4px; }
+    .overall-tracker .tracker-score { font-size: 32px; font-weight: 800; color: var(--teal); line-height: 1; }
+    .overall-tracker .tracker-sub { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+
+    /* Submit */
+    .btn-submit { display: block; width: 100%; padding: 16px; background: var(--orange); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 0.3px; transition: background 0.2s; font-family: inherit; }
+    .btn-submit:hover:not(:disabled) { background: var(--orange-dark); }
+    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+    .submit-hint { font-size: 13px; color: var(--text-light); text-align: center; margin-bottom: 14px; }
+    .submission-status { text-align: center; padding: 11px 16px; border-radius: 6px; font-size: 14px; margin-top: 12px; display: none; }
+    .submission-status.sending { background: var(--light-teal); color: var(--teal); display: block; }
+    .submission-status.sent    { background: #EDF7ED; color: var(--success); display: block; }
+    .submission-status.failed  { background: #FDE8E6; color: var(--danger); display: block; }
+
+    /* Results */
+    .results-card { display: none; background: white; border-radius: 10px; padding: 44px 32px 36px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.09); }
+    .results-card.pass   { border-top: 6px solid var(--success); }
+    .results-card.retake { border-top: 6px solid var(--danger); }
+    .results-module-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: #aaa; margin-bottom: 8px; }
+    .score-display-big { font-size: 72px; font-weight: 800; line-height: 1; margin: 6px 0 4px; }
+    .score-display-big.pass   { color: var(--success); }
+    .score-display-big.retake { color: var(--danger); }
+    .score-total-line { font-size: 18px; color: #aaa; margin-bottom: 14px; }
+    .verdict { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+    .verdict.pass   { color: var(--success); }
+    .verdict.retake { color: var(--danger); }
+    .results-note { font-size: 14px; color: var(--text-light); max-width: 520px; margin: 0 auto 28px; line-height: 1.75; }
+    .btn-retake { display: inline-block; padding: 12px 32px; background: var(--teal); color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .btn-retake:hover { background: var(--teal-dark); }
+
+    @media (max-width: 600px) {
+      .trainee-grid { grid-template-columns: 1fr; }
+      .card, .scenario-body { padding: 18px 16px; }
+      .sw-table { grid-template-columns: 1fr; }
+      .rubric-row { flex-wrap: wrap; }
+      .score-display-big { font-size: 56px; }
+      .lock-row { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Module 5 Assessment</h1>
+    <p>Doobert Connect Foster Support Training</p>
+  </div>
+
+  <div class="card card-first">
+    <div class="info-box">
+      <h3>How This Assessment Works</h3>
+      <p>This is a self-paced, written assessment. No supervisor or trainer is required to complete it.</p>
+      <p>For each scenario: write your full response in all three fields, then click <strong>Lock My Responses</strong>. Once locked, the model answer becomes available to review.</p>
+      <p>After reading the model answer, use the Self-Evaluation Rubric to score yourself honestly on 5 criteria. Your written responses cannot be edited after locking.</p>
+      <p><strong>Passing: Score 4 or 5 out of 5 on at least 6 of the 7 scenarios.</strong> If you fall below this, re-read the relevant symptom section and redo the exercise before moving to Module 6.</p>
+    </div>
+  </div>
+
+  <form id="assessmentForm" novalidate>
+
+    <!-- Trainee Info -->
+    <div class="card">
+      <h2 style="color:var(--teal);font-size:16px;margin-bottom:4px;">Trainee Information</h2>
+      <div class="trainee-grid">
+        <div>
+          <label for="traineeName">Full Name *</label>
+          <input type="text" id="traineeName" placeholder="Your full name" required autocomplete="name">
+          <div class="error-msg" id="nameError">Please enter your full name.</div>
+        </div>
+        <div>
+          <label for="assessmentDate">Date *</label>
+          <input type="date" id="assessmentDate" required>
+          <div class="error-msg" id="dateError">Please select a date.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCENARIO 1 ===== -->
+    <div class="scenario-card">
+      <div class="scenario-header" style="background:#2E7D8C;">
+        <div class="scenario-label">Scenario 1</div>
+        <div class="foster-quote">"My dog threw up."</div>
+      </div>
+      <div class="scenario-body">
+        <div class="response-section">
+          <h4>Your Response — Complete the intake below</h4>
+          <div class="field-group">
+            <label>Write your 3–5 key questions:</label>
+            <textarea id="s1_questions" name="s1_questions" placeholder="List your questions here…"></textarea>
+          </div>
+          <div class="field-group">
+            <label>What information is still missing?</label>
+            <textarea id="s1_missing" name="s1_missing" placeholder="What else do you need to know before acting?"></textarea>
+          </div>
+          <div class="field-group">
+            <label>Your initial next step based on what you know so far:</label>
+            <textarea id="s1_nextstep" name="s1_nextstep" placeholder="Describe your next action…"></textarea>
+          </div>
+        </div>
+        <div class="lock-row">
+          <button type="button" class="btn-lock" id="lock1-btn" onclick="lockScenario(1)">🔒 Lock My Responses</button>
+          <span class="lock-warning" id="lock1-warn">Please fill in all three fields before locking.</span>
+          <div class="locked-badge" id="lock1-badge">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 7H12V5A4 4 0 004 5v2H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1zM6 5a2 2 0 014 0v2H6V5zm2 7a1 1 0 110-2 1 1 0 010 2z" fill="#2E7D52"/></svg>
+            Responses locked — ready to reveal model answer
+          </div>
+        </div>
+        <button type="button" class="btn-reveal" id="reveal1-btn" onclick="toggleModel('model1','reveal1-btn')">👁 Reveal Model Answer</button>
+        <div id="model1" class="model-answer">
+          <h4>✅ Model Answer — Compare your responses below</h4>
+          <div class="model-section"><div class="model-section-title">Key Questions to Ask:</div><ul><li>When did the vomiting happen, and how many times has it occurred since then?</li><li>What did the vomit look like — food, liquid, bile (yellow/green), or foam?</li><li>Is your dog still active and behaving normally, or does it seem quieter or more tired?</li><li>Is your dog eating and drinking normally, or showing any reluctance toward food or water?</li><li>Any recent dietary changes, or any chance your dog could have eaten something unusual?</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Information Still Needed:</div><ul><li>Animal age (especially if this is a puppy)</li><li>Whether vomiting has stopped or is ongoing</li><li>Whether the dog was seen attempting to vomit without producing anything (non-productive retching — possible blockage)</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Initial Next Step:</div><div class="next-step">If this is a single episode in an otherwise active, eating dog with no other symptoms: classify as Blue. Submit the Support Form with Blue tag. Provide specific monitoring guidance: watch for repeated vomiting, energy change, or inability to keep water down. If multiple episodes or any energy change is confirmed, reassess as Yellow. For Red signals (continuous vomiting, blood, suspected foreign body), check the Internal Site for this org's emergency protocol before giving further direction. Document all actions in the Support Form.</div></div>
+          <div class="model-section"><div class="model-section-title" style="color:var(--danger);">What Would Escalate This Case:</div><ul class="escalate-list"><li>Repeated vomiting (3+ times) moves to Yellow</li><li>Any lethargy alongside vomiting = Yellow minimum</li><li>Blood in vomit or suspected foreign body = Red — check Internal Site for org-specific emergency protocol</li><li>Unable to keep water down = urgent dehydration risk</li></ul></div>
+          <div class="sw-table"><div class="sw-col sw-strong"><h5>✅ Strong Response Includes</h5><ul><li>Questions cover timeline, frequency, appearance, energy, and appetite</li><li>Questions are specific and targeted</li><li>No diagnosis or early recommendation is included</li><li>Missing information is correctly identified before acting</li><li>Initial next step reflects the information gathered (not a guess)</li></ul></div><div class="sw-col sw-weak"><h5>❌ Weak Response Shows</h5><ul><li>Generic questions that add no new information</li><li>Jumping to a recommendation before all questions are answered</li><li>Missing energy or appetite from the intake</li><li>Providing a diagnosis</li><li>Not identifying what is still unknown before acting</li></ul></div></div>
+        </div>
+        <div class="rubric-section" id="rubric1">
+          <h4>Self-Evaluation Rubric — Scenario 1</h4>
+          <p class="rubric-hint">Score yourself after reviewing the model answer above.</p>
+          <div class="rubric-row"><span class="rubric-num">1</span><div class="rubric-criterion">My questions cover at least 3 of the 4 core areas: what, when, frequency/severity, overall animal condition</div><div class="rubric-options"><label><input type="radio" name="s1_r1" value="1" onchange="updateScore(1)"> Met</label><label><input type="radio" name="s1_r1" value="0" onchange="updateScore(1)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">2</span><div class="rubric-criterion">All of my questions are specific and relevant to this symptom — no generic or irrelevant questions included</div><div class="rubric-options"><label><input type="radio" name="s1_r2" value="1" onchange="updateScore(1)"> Met</label><label><input type="radio" name="s1_r2" value="0" onchange="updateScore(1)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">3</span><div class="rubric-criterion">I did not give any recommendation before completing my questions</div><div class="rubric-options"><label><input type="radio" name="s1_r3" value="1" onchange="updateScore(1)"> Met</label><label><input type="radio" name="s1_r3" value="0" onchange="updateScore(1)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">4</span><div class="rubric-criterion">I correctly identified the most important missing information for this scenario</div><div class="rubric-options"><label><input type="radio" name="s1_r4" value="1" onchange="updateScore(1)"> Met</label><label><input type="radio" name="s1_r4" value="0" onchange="updateScore(1)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">5</span><div class="rubric-criterion">My initial next step is proportionate to what I know, and for any Red/urgent signals, I referenced checking the Internal Site for the org-specific emergency protocol</div><div class="rubric-options"><label><input type="radio" name="s1_r5" value="1" onchange="updateScore(1)"> Met</label><label><input type="radio" name="s1_r5" value="0" onchange="updateScore(1)"> Not Met</label></div></div>
+          <div class="score-pill" id="score1-display">Score: — / 5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCENARIO 2 ===== -->
+    <div class="scenario-card">
+      <div class="scenario-header" style="background:#7B3200;">
+        <div class="scenario-label">Scenario 2</div>
+        <div class="foster-quote">"My kitten isn't eating."</div>
+      </div>
+      <div class="scenario-body">
+        <div class="response-section">
+          <h4>Your Response — Complete the intake below</h4>
+          <div class="field-group"><label>Write your 3–5 key questions:</label><textarea id="s2_questions" name="s2_questions" placeholder="List your questions here…"></textarea></div>
+          <div class="field-group"><label>What information is still missing?</label><textarea id="s2_missing" name="s2_missing" placeholder="What else do you need to know before acting?"></textarea></div>
+          <div class="field-group"><label>Your initial next step based on what you know so far:</label><textarea id="s2_nextstep" name="s2_nextstep" placeholder="Describe your next action…"></textarea></div>
+        </div>
+        <div class="lock-row">
+          <button type="button" class="btn-lock" id="lock2-btn" onclick="lockScenario(2)">🔒 Lock My Responses</button>
+          <span class="lock-warning" id="lock2-warn">Please fill in all three fields before locking.</span>
+          <div class="locked-badge" id="lock2-badge"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 7H12V5A4 4 0 004 5v2H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1zM6 5a2 2 0 014 0v2H6V5zm2 7a1 1 0 110-2 1 1 0 010 2z" fill="#2E7D52"/></svg>Responses locked — ready to reveal model answer</div>
+        </div>
+        <button type="button" class="btn-reveal" id="reveal2-btn" onclick="toggleModel('model2','reveal2-btn')">👁 Reveal Model Answer</button>
+        <div id="model2" class="model-answer">
+          <h4>✅ Model Answer — Compare your responses below</h4>
+          <div class="model-section"><div class="model-section-title">Key Questions to Ask:</div><ul><li>How old is the kitten? (Critical first question — age determines the entire urgency threshold)</li><li>How long has the kitten not been eating? When was the last successful feeding, and how much did it take?</li><li>Is the kitten still active and responsive when you handle it, or does it seem weak or unresponsive?</li><li>Is the kitten warm or does it feel cold to the touch?</li><li>Is the kitten bottle-fed or with a mother cat?</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Information Still Needed:</div><ul><li>Whether the kitten is vocalizing or silent</li><li>Whether there are any other symptoms alongside the appetite change</li><li>Whether there have been any recent changes (environment, temperature, formula)</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Initial Next Step:</div><div class="next-step">Age changes everything here. A 3-week-old kitten not eating for 4 hours is a potential Red/Yellow case requiring immediate action. An 8-week-old kitten that skipped one meal with normal energy may be Blue or Green. Do not give any guidance until you have confirmed age and duration. If age and duration confirm a neonatal or very young kitten in decline: check the Internal Site for this organization's emergency protocol and follow their specific instructions — this may mean directing the foster to an emergency vet immediately or contacting the Foster Coordinator first. Document all actions in the Support Form.</div></div>
+          <div class="model-section"><div class="model-section-title" style="color:var(--danger);">What Would Escalate This Case:</div><ul class="escalate-list"><li>Cold to touch = hypothermia, immediate intervention needed</li><li>Unresponsive or weak = Red — check Internal Site for org-specific emergency protocol immediately</li><li>Any kitten under 4 weeks not eating for 4+ hours = urgent</li><li>Not eating + not vocalizing when handled = critical sign</li></ul></div>
+          <div class="sw-table"><div class="sw-col sw-strong"><h5>✅ Strong Response Includes</h5><ul><li>Age is the first or second question asked</li><li>Duration of the appetite change is established early</li><li>Responsiveness is assessed</li><li>Body temperature is checked for neonates</li><li>Response acknowledges urgency threshold difference based on age</li></ul></div><div class="sw-col sw-weak"><h5>❌ Weak Response Shows</h5><ul><li>Age is not asked early in the intake</li><li>Duration of the issue is not clarified</li><li>Advice is given before age and duration are confirmed</li><li>Energy/responsiveness is not assessed</li><li>All kittens are treated the same regardless of age</li></ul></div></div>
+        </div>
+        <div class="rubric-section" id="rubric2">
+          <h4>Self-Evaluation Rubric — Scenario 2</h4><p class="rubric-hint">Score yourself after reviewing the model answer above.</p>
+          <div class="rubric-row"><span class="rubric-num">1</span><div class="rubric-criterion">My questions cover at least 3 of the 4 core areas: what, when, frequency/severity, overall animal condition</div><div class="rubric-options"><label><input type="radio" name="s2_r1" value="1" onchange="updateScore(2)"> Met</label><label><input type="radio" name="s2_r1" value="0" onchange="updateScore(2)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">2</span><div class="rubric-criterion">All of my questions are specific and relevant to this symptom — no generic or irrelevant questions included</div><div class="rubric-options"><label><input type="radio" name="s2_r2" value="1" onchange="updateScore(2)"> Met</label><label><input type="radio" name="s2_r2" value="0" onchange="updateScore(2)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">3</span><div class="rubric-criterion">I did not give any recommendation before completing my questions</div><div class="rubric-options"><label><input type="radio" name="s2_r3" value="1" onchange="updateScore(2)"> Met</label><label><input type="radio" name="s2_r3" value="0" onchange="updateScore(2)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">4</span><div class="rubric-criterion">I correctly identified the most important missing information for this scenario</div><div class="rubric-options"><label><input type="radio" name="s2_r4" value="1" onchange="updateScore(2)"> Met</label><label><input type="radio" name="s2_r4" value="0" onchange="updateScore(2)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">5</span><div class="rubric-criterion">My initial next step is proportionate to what I know, and for any Red/urgent signals, I referenced checking the Internal Site for the org-specific emergency protocol</div><div class="rubric-options"><label><input type="radio" name="s2_r5" value="1" onchange="updateScore(2)"> Met</label><label><input type="radio" name="s2_r5" value="0" onchange="updateScore(2)"> Not Met</label></div></div>
+          <div class="score-pill" id="score2-display">Score: — / 5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCENARIO 3 ===== -->
+    <div class="scenario-card">
+      <div class="scenario-header" style="background:#E8640A;">
+        <div class="scenario-label">Scenario 3</div>
+        <div class="foster-quote">"My dog is limping."</div>
+      </div>
+      <div class="scenario-body">
+        <div class="response-section">
+          <h4>Your Response — Complete the intake below</h4>
+          <div class="field-group"><label>Write your 3–5 key questions:</label><textarea id="s3_questions" name="s3_questions" placeholder="List your questions here…"></textarea></div>
+          <div class="field-group"><label>What information is still missing?</label><textarea id="s3_missing" name="s3_missing" placeholder="What else do you need to know before acting?"></textarea></div>
+          <div class="field-group"><label>Your initial next step based on what you know so far:</label><textarea id="s3_nextstep" name="s3_nextstep" placeholder="Describe your next action…"></textarea></div>
+        </div>
+        <div class="lock-row">
+          <button type="button" class="btn-lock" id="lock3-btn" onclick="lockScenario(3)">🔒 Lock My Responses</button>
+          <span class="lock-warning" id="lock3-warn">Please fill in all three fields before locking.</span>
+          <div class="locked-badge" id="lock3-badge"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 7H12V5A4 4 0 004 5v2H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1zM6 5a2 2 0 014 0v2H6V5zm2 7a1 1 0 110-2 1 1 0 010 2z" fill="#2E7D52"/></svg>Responses locked — ready to reveal model answer</div>
+        </div>
+        <button type="button" class="btn-reveal" id="reveal3-btn" onclick="toggleModel('model3','reveal3-btn')">👁 Reveal Model Answer</button>
+        <div id="model3" class="model-answer">
+          <h4>✅ Model Answer — Compare your responses below</h4>
+          <div class="model-section"><div class="model-section-title">Key Questions to Ask:</div><ul><li>When did the limping start? Did something happen that might have caused it, or did it appear without a known cause?</li><li>Is the dog putting any weight on the affected leg, or is it holding the leg completely off the ground?</li><li>Do you see any visible swelling, cuts, or wounds on the leg or paw?</li><li>Has the limping been improving, getting worse, or staying the same since it started?</li><li>Is the dog still active and behaving normally otherwise, or is it quieter and less engaged?</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Information Still Needed:</div><ul><li>Whether the dog vocalizes or shows pain when the leg is touched</li><li>Which leg is affected and where the limping seems to originate</li><li>Whether there has been a recent fall, jump, or known trauma</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Initial Next Step:</div><div class="next-step">Weight-bearing status is the most critical signal. If the dog is bearing some weight and the limping appeared after activity: monitor with guidance, reassess in a few hours. If not improving after rest, move to Green. If the dog is not bearing any weight, or if there is visible injury or pain response when touched, classify as Yellow and advise vet attention within 24–48 hours. For severe presentations (unable to stand, extreme pain), check the Internal Site for this org's emergency protocol. Document all actions in the Support Form.</div></div>
+          <div class="model-section"><div class="model-section-title" style="color:var(--danger);">What Would Escalate This Case:</div><ul class="escalate-list"><li>Not bearing weight = Yellow minimum</li><li>Visible open wounds = needs prompt attention regardless of weight-bearing</li><li>Extreme pain response or inability to stand = check Internal Site for org emergency protocol</li><li>Limping with no improvement after rest + energy reduction = Yellow</li></ul></div>
+          <div class="sw-table"><div class="sw-col sw-strong"><h5>✅ Strong Response Includes</h5><ul><li>Weight-bearing status is asked explicitly</li><li>Timing and possible cause are established</li><li>Visible injury is assessed</li><li>Direction of progression (improving/worsening) is asked</li><li>Overall energy and behavior are checked</li></ul></div><div class="sw-col sw-weak"><h5>❌ Weak Response Shows</h5><ul><li>Weight-bearing is not asked (most common omission for limping)</li><li>Direction of progression is not assessed</li><li>No check for visible injury or pain response</li><li>Age of the animal is not considered</li><li>Only one or two questions are asked before concluding</li></ul></div></div>
+        </div>
+        <div class="rubric-section" id="rubric3">
+          <h4>Self-Evaluation Rubric — Scenario 3</h4><p class="rubric-hint">Score yourself after reviewing the model answer above.</p>
+          <div class="rubric-row"><span class="rubric-num">1</span><div class="rubric-criterion">My questions cover at least 3 of the 4 core areas: what, when, frequency/severity, overall animal condition</div><div class="rubric-options"><label><input type="radio" name="s3_r1" value="1" onchange="updateScore(3)"> Met</label><label><input type="radio" name="s3_r1" value="0" onchange="updateScore(3)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">2</span><div class="rubric-criterion">All of my questions are specific and relevant to this symptom — no generic or irrelevant questions included</div><div class="rubric-options"><label><input type="radio" name="s3_r2" value="1" onchange="updateScore(3)"> Met</label><label><input type="radio" name="s3_r2" value="0" onchange="updateScore(3)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">3</span><div class="rubric-criterion">I did not give any recommendation before completing my questions</div><div class="rubric-options"><label><input type="radio" name="s3_r3" value="1" onchange="updateScore(3)"> Met</label><label><input type="radio" name="s3_r3" value="0" onchange="updateScore(3)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">4</span><div class="rubric-criterion">I correctly identified the most important missing information for this scenario</div><div class="rubric-options"><label><input type="radio" name="s3_r4" value="1" onchange="updateScore(3)"> Met</label><label><input type="radio" name="s3_r4" value="0" onchange="updateScore(3)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">5</span><div class="rubric-criterion">My initial next step is proportionate to what I know, and for any Red/urgent signals, I referenced checking the Internal Site for the org-specific emergency protocol</div><div class="rubric-options"><label><input type="radio" name="s3_r5" value="1" onchange="updateScore(3)"> Met</label><label><input type="radio" name="s3_r5" value="0" onchange="updateScore(3)"> Not Met</label></div></div>
+          <div class="score-pill" id="score3-display">Score: — / 5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCENARIO 4 ===== -->
+    <div class="scenario-card">
+      <div class="scenario-header" style="background:#1E5B8C;">
+        <div class="scenario-label">Scenario 4</div>
+        <div class="foster-quote">"My cat has diarrhea."</div>
+      </div>
+      <div class="scenario-body">
+        <div class="response-section">
+          <h4>Your Response — Complete the intake below</h4>
+          <div class="field-group"><label>Write your 3–5 key questions:</label><textarea id="s4_questions" name="s4_questions" placeholder="List your questions here…"></textarea></div>
+          <div class="field-group"><label>What information is still missing?</label><textarea id="s4_missing" name="s4_missing" placeholder="What else do you need to know before acting?"></textarea></div>
+          <div class="field-group"><label>Your initial next step based on what you know so far:</label><textarea id="s4_nextstep" name="s4_nextstep" placeholder="Describe your next action…"></textarea></div>
+        </div>
+        <div class="lock-row">
+          <button type="button" class="btn-lock" id="lock4-btn" onclick="lockScenario(4)">🔒 Lock My Responses</button>
+          <span class="lock-warning" id="lock4-warn">Please fill in all three fields before locking.</span>
+          <div class="locked-badge" id="lock4-badge"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 7H12V5A4 4 0 004 5v2H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1zM6 5a2 2 0 014 0v2H6V5zm2 7a1 1 0 110-2 1 1 0 010 2z" fill="#2E7D52"/></svg>Responses locked — ready to reveal model answer</div>
+        </div>
+        <button type="button" class="btn-reveal" id="reveal4-btn" onclick="toggleModel('model4','reveal4-btn')">👁 Reveal Model Answer</button>
+        <div id="model4" class="model-answer">
+          <h4>✅ Model Answer — Compare your responses below</h4>
+          <div class="model-section"><div class="model-section-title">Key Questions to Ask:</div><ul><li>When did the diarrhea start, and how many times has it happened so far?</li><li>What does the stool look like — soft, watery, or is there any blood or mucus?</li><li>Is your cat still eating and drinking normally?</li><li>Is your cat active and behaving normally, or does it seem tired or less engaged?</li><li>Any recent food changes, new treats, or anything the cat might have gotten into?</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Information Still Needed:</div><ul><li>Animal age (kitten diarrhea is significantly more urgent than adult cat diarrhea)</li><li>Whether there are any other symptoms alongside the diarrhea</li><li>Whether the diarrhea has been consistent or in waves</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Initial Next Step:</div><div class="next-step">If this is a single episode in an adult cat that is still active and eating, classify as Blue. Advise monitoring: watch for recurrence, blood in stool, changes in energy or appetite, and report those immediately. If it has happened 2–3 times in the same day, move to Green. If there is blood in the stool at any frequency, move to at least Yellow and flag for coordinator. If the cat is also showing reduced energy or appetite, reassess as Yellow. For Red signals, check the Internal Site for org-specific emergency protocol and document all actions in the Support Form.</div></div>
+          <div class="model-section"><div class="model-section-title" style="color:var(--danger);">What Would Escalate This Case:</div><ul class="escalate-list"><li>Blood or mucus in stool = always at least Yellow, vet needed</li><li>Multiple episodes in a day + any energy change = Yellow</li><li>Diarrhea in a kitten under 8 weeks = treat with higher urgency</li><li>Diarrhea + not drinking = dehydration risk</li></ul></div>
+          <div class="sw-table"><div class="sw-col sw-strong"><h5>✅ Strong Response Includes</h5><ul><li>Frequency and timing are established</li><li>Stool appearance is assessed (including blood/mucus)</li><li>Eating and drinking are both confirmed</li><li>Energy level is checked</li><li>Recent changes are explored</li></ul></div><div class="sw-col sw-weak"><h5>❌ Weak Response Shows</h5><ul><li>Only frequency is asked, appearance is skipped</li><li>Energy level is not assessed</li><li>Blood in stool is not specifically asked about</li><li>Age of the cat is not considered</li><li>No check for other concurrent symptoms</li></ul></div></div>
+        </div>
+        <div class="rubric-section" id="rubric4">
+          <h4>Self-Evaluation Rubric — Scenario 4</h4><p class="rubric-hint">Score yourself after reviewing the model answer above.</p>
+          <div class="rubric-row"><span class="rubric-num">1</span><div class="rubric-criterion">My questions cover at least 3 of the 4 core areas: what, when, frequency/severity, overall animal condition</div><div class="rubric-options"><label><input type="radio" name="s4_r1" value="1" onchange="updateScore(4)"> Met</label><label><input type="radio" name="s4_r1" value="0" onchange="updateScore(4)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">2</span><div class="rubric-criterion">All of my questions are specific and relevant to this symptom — no generic or irrelevant questions included</div><div class="rubric-options"><label><input type="radio" name="s4_r2" value="1" onchange="updateScore(4)"> Met</label><label><input type="radio" name="s4_r2" value="0" onchange="updateScore(4)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">3</span><div class="rubric-criterion">I did not give any recommendation before completing my questions</div><div class="rubric-options"><label><input type="radio" name="s4_r3" value="1" onchange="updateScore(4)"> Met</label><label><input type="radio" name="s4_r3" value="0" onchange="updateScore(4)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">4</span><div class="rubric-criterion">I correctly identified the most important missing information for this scenario</div><div class="rubric-options"><label><input type="radio" name="s4_r4" value="1" onchange="updateScore(4)"> Met</label><label><input type="radio" name="s4_r4" value="0" onchange="updateScore(4)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">5</span><div class="rubric-criterion">My initial next step is proportionate to what I know, and for any Red/urgent signals, I referenced checking the Internal Site for the org-specific emergency protocol</div><div class="rubric-options"><label><input type="radio" name="s4_r5" value="1" onchange="updateScore(4)"> Met</label><label><input type="radio" name="s4_r5" value="0" onchange="updateScore(4)"> Not Met</label></div></div>
+          <div class="score-pill" id="score4-display">Score: — / 5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCENARIO 5 ===== -->
+    <div class="scenario-card">
+      <div class="scenario-header" style="background:#2E6B47;">
+        <div class="scenario-label">Scenario 5</div>
+        <div class="foster-quote">"My kitten is sneezing a lot."</div>
+      </div>
+      <div class="scenario-body">
+        <div class="response-section">
+          <h4>Your Response — Complete the intake below</h4>
+          <div class="field-group"><label>Write your 3–5 key questions:</label><textarea id="s5_questions" name="s5_questions" placeholder="List your questions here…"></textarea></div>
+          <div class="field-group"><label>What information is still missing?</label><textarea id="s5_missing" name="s5_missing" placeholder="What else do you need to know before acting?"></textarea></div>
+          <div class="field-group"><label>Your initial next step based on what you know so far:</label><textarea id="s5_nextstep" name="s5_nextstep" placeholder="Describe your next action…"></textarea></div>
+        </div>
+        <div class="lock-row">
+          <button type="button" class="btn-lock" id="lock5-btn" onclick="lockScenario(5)">🔒 Lock My Responses</button>
+          <span class="lock-warning" id="lock5-warn">Please fill in all three fields before locking.</span>
+          <div class="locked-badge" id="lock5-badge"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 7H12V5A4 4 0 004 5v2H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1zM6 5a2 2 0 014 0v2H6V5zm2 7a1 1 0 110-2 1 1 0 010 2z" fill="#2E7D52"/></svg>Responses locked — ready to reveal model answer</div>
+        </div>
+        <button type="button" class="btn-reveal" id="reveal5-btn" onclick="toggleModel('model5','reveal5-btn')">👁 Reveal Model Answer</button>
+        <div id="model5" class="model-answer">
+          <h4>✅ Model Answer — Compare your responses below</h4>
+          <div class="model-section"><div class="model-section-title">Key Questions to Ask:</div><ul><li>When did the sneezing start, and has it been getting better, worse, or staying the same?</li><li>Is there any discharge from the nose or eyes? If so, what color — clear, white, yellow, or green?</li><li>Is the kitten still eating normally? Kittens with congestion sometimes stop eating because they cannot smell food.</li><li>What is the kitten's energy level? Still active and playful, or quieter than usual?</li><li>Is the kitten breathing normally, or do you notice any labored, noisy, or open-mouth breathing?</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Information Still Needed:</div><ul><li>Kitten age (neonates with URI require more urgent attention)</li><li>Whether the kitten has been around other cats or recently arrived from a shelter</li><li>Whether other animals in the household are showing the same symptoms</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Initial Next Step:</div><div class="next-step">If the kitten is sneezing with clear discharge, eating normally, and active with normal breathing, this is typically Green. Advise monitoring and flag for possible vet check within 48–72 hours if symptoms do not improve. If discharge is yellow or green, move to Yellow and advise vet within 24–48 hours. If there is any breathing difficulty or the kitten has stopped eating: check the Internal Site for the org-specific emergency protocol and follow their instructions. Document all actions in the Support Form.</div></div>
+          <div class="model-section"><div class="model-section-title" style="color:var(--danger);">What Would Escalate This Case:</div><ul class="escalate-list"><li>Colored discharge (yellow/green) = Yellow, vet within 24–48 hours</li><li>Stopped eating due to congestion = higher urgency, especially in young kittens</li><li>Any breathing difficulty = check Internal Site for org emergency protocol immediately</li><li>Sneezing + eye discharge + lethargy in very young kitten = Yellow to Red</li></ul></div>
+          <div class="sw-table"><div class="sw-col sw-strong"><h5>✅ Strong Response Includes</h5><ul><li>Discharge color and type is specifically asked</li><li>Eating status is assessed (including congestion effect)</li><li>Breathing status is explicitly checked</li><li>Energy level is assessed</li><li>Symptom duration and progression are established</li></ul></div><div class="sw-col sw-weak"><h5>❌ Weak Response Shows</h5><ul><li>Only sneezing frequency is asked, discharge is omitted</li><li>Breathing is not assessed (most critical omission for URI)</li><li>Eating is checked but congestion connection is not noted</li><li>Age of the kitten is not established early</li><li>Progression (better/worse) is not asked</li></ul></div></div>
+        </div>
+        <div class="rubric-section" id="rubric5">
+          <h4>Self-Evaluation Rubric — Scenario 5</h4><p class="rubric-hint">Score yourself after reviewing the model answer above.</p>
+          <div class="rubric-row"><span class="rubric-num">1</span><div class="rubric-criterion">My questions cover at least 3 of the 4 core areas: what, when, frequency/severity, overall animal condition</div><div class="rubric-options"><label><input type="radio" name="s5_r1" value="1" onchange="updateScore(5)"> Met</label><label><input type="radio" name="s5_r1" value="0" onchange="updateScore(5)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">2</span><div class="rubric-criterion">All of my questions are specific and relevant to this symptom — no generic or irrelevant questions included</div><div class="rubric-options"><label><input type="radio" name="s5_r2" value="1" onchange="updateScore(5)"> Met</label><label><input type="radio" name="s5_r2" value="0" onchange="updateScore(5)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">3</span><div class="rubric-criterion">I did not give any recommendation before completing my questions</div><div class="rubric-options"><label><input type="radio" name="s5_r3" value="1" onchange="updateScore(5)"> Met</label><label><input type="radio" name="s5_r3" value="0" onchange="updateScore(5)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">4</span><div class="rubric-criterion">I correctly identified the most important missing information for this scenario</div><div class="rubric-options"><label><input type="radio" name="s5_r4" value="1" onchange="updateScore(5)"> Met</label><label><input type="radio" name="s5_r4" value="0" onchange="updateScore(5)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">5</span><div class="rubric-criterion">My initial next step is proportionate to what I know, and for any Red/urgent signals, I referenced checking the Internal Site for the org-specific emergency protocol</div><div class="rubric-options"><label><input type="radio" name="s5_r5" value="1" onchange="updateScore(5)"> Met</label><label><input type="radio" name="s5_r5" value="0" onchange="updateScore(5)"> Not Met</label></div></div>
+          <div class="score-pill" id="score5-display">Score: — / 5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCENARIO 6 ===== -->
+    <div class="scenario-card">
+      <div class="scenario-header" style="background:#2C3A4A;">
+        <div class="scenario-label">Scenario 6</div>
+        <div class="foster-quote">"My foster dog has been coughing since last night."</div>
+      </div>
+      <div class="scenario-body">
+        <div class="response-section">
+          <h4>Your Response — Complete the intake below</h4>
+          <div class="field-group"><label>Write your 3–5 key questions:</label><textarea id="s6_questions" name="s6_questions" placeholder="List your questions here…"></textarea></div>
+          <div class="field-group"><label>What information is still missing?</label><textarea id="s6_missing" name="s6_missing" placeholder="What else do you need to know before acting?"></textarea></div>
+          <div class="field-group"><label>Your initial next step based on what you know so far:</label><textarea id="s6_nextstep" name="s6_nextstep" placeholder="Describe your next action…"></textarea></div>
+        </div>
+        <div class="lock-row">
+          <button type="button" class="btn-lock" id="lock6-btn" onclick="lockScenario(6)">🔒 Lock My Responses</button>
+          <span class="lock-warning" id="lock6-warn">Please fill in all three fields before locking.</span>
+          <div class="locked-badge" id="lock6-badge"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 7H12V5A4 4 0 004 5v2H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1zM6 5a2 2 0 014 0v2H6V5zm2 7a1 1 0 110-2 1 1 0 010 2z" fill="#2E7D52"/></svg>Responses locked — ready to reveal model answer</div>
+        </div>
+        <button type="button" class="btn-reveal" id="reveal6-btn" onclick="toggleModel('model6','reveal6-btn')">👁 Reveal Model Answer</button>
+        <div id="model6" class="model-answer">
+          <h4>✅ Model Answer — Compare your responses below</h4>
+          <div class="model-section"><div class="model-section-title">Key Questions to Ask:</div><ul><li>How would you describe the cough — does it sound like a honk or hack, or is it wet and productive?</li><li>How long has it been happening, and has it been constant or coming and going?</li><li>Is your dog still active and playful, or does it seem tired or quieter than usual?</li><li>Is your dog still eating and drinking normally?</li><li>Is your dog having any difficulty breathing, or is the breathing normal aside from the coughing?</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Information Still Needed:</div><ul><li>Recent contact with other dogs, shelter stays, or boarding</li><li>Whether the dog gags or retches after coughing</li><li>Whether other dogs in the household may have been exposed</li><li>Age and vaccination status if known</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Initial Next Step:</div><div class="next-step">A honking or hacking cough that started after potential exposure to other dogs, in a dog that is still active and eating normally, is a classic kennel cough presentation — typically Green. Submit with Green tag, advise monitoring for 48–72 hours, and flag for vet check if symptoms are not improving. If the dog shows any reduced energy or appetite alongside the coughing, move to Yellow. If there is any breathing difficulty at all: check the Internal Site for this org's emergency protocol and follow their specific instructions. Document all actions in the Support Form.</div></div>
+          <div class="model-section"><div class="model-section-title" style="color:var(--danger);">What Would Escalate This Case:</div><ul class="escalate-list"><li>Breathing difficulty alongside coughing = check Internal Site for org emergency protocol immediately</li><li>Coughing + lethargy or reduced appetite = Yellow, vet within 24–48 hours</li><li>Wet, productive cough vs. dry honking cough — wet/productive is more concerning</li><li>Puppies with kennel cough require more urgent attention than healthy adults</li></ul></div>
+          <div class="sw-table"><div class="sw-col sw-strong"><h5>✅ Strong Response Includes</h5><ul><li>Cough character (honking vs. wet) is specifically asked</li><li>Duration is established</li><li>Breathing difficulty is explicitly checked</li><li>Energy and activity are assessed</li><li>Eating and drinking are confirmed</li></ul></div><div class="sw-col sw-weak"><h5>❌ Weak Response Shows</h5><ul><li>Cough character is not asked (generic "how long" only)</li><li>Breathing difficulty is not assessed (critical omission)</li><li>Energy is not asked about</li><li>Exposure history is not explored</li><li>Age is not considered</li></ul></div></div>
+        </div>
+        <div class="rubric-section" id="rubric6">
+          <h4>Self-Evaluation Rubric — Scenario 6</h4><p class="rubric-hint">Score yourself after reviewing the model answer above.</p>
+          <div class="rubric-row"><span class="rubric-num">1</span><div class="rubric-criterion">My questions cover at least 3 of the 4 core areas: what, when, frequency/severity, overall animal condition</div><div class="rubric-options"><label><input type="radio" name="s6_r1" value="1" onchange="updateScore(6)"> Met</label><label><input type="radio" name="s6_r1" value="0" onchange="updateScore(6)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">2</span><div class="rubric-criterion">All of my questions are specific and relevant to this symptom — no generic or irrelevant questions included</div><div class="rubric-options"><label><input type="radio" name="s6_r2" value="1" onchange="updateScore(6)"> Met</label><label><input type="radio" name="s6_r2" value="0" onchange="updateScore(6)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">3</span><div class="rubric-criterion">I did not give any recommendation before completing my questions</div><div class="rubric-options"><label><input type="radio" name="s6_r3" value="1" onchange="updateScore(6)"> Met</label><label><input type="radio" name="s6_r3" value="0" onchange="updateScore(6)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">4</span><div class="rubric-criterion">I correctly identified the most important missing information for this scenario</div><div class="rubric-options"><label><input type="radio" name="s6_r4" value="1" onchange="updateScore(6)"> Met</label><label><input type="radio" name="s6_r4" value="0" onchange="updateScore(6)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">5</span><div class="rubric-criterion">My initial next step is proportionate to what I know, and for any Red/urgent signals, I referenced checking the Internal Site for the org-specific emergency protocol</div><div class="rubric-options"><label><input type="radio" name="s6_r5" value="1" onchange="updateScore(6)"> Met</label><label><input type="radio" name="s6_r5" value="0" onchange="updateScore(6)"> Not Met</label></div></div>
+          <div class="score-pill" id="score6-display">Score: — / 5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SCENARIO 7 ===== -->
+    <div class="scenario-card">
+      <div class="scenario-header" style="background:#7B3200;">
+        <div class="scenario-label">Scenario 7</div>
+        <div class="foster-quote">"Something is wrong with my baby kitten. She seems really weak and won't feed."</div>
+      </div>
+      <div class="scenario-body">
+        <div class="response-section">
+          <h4>Your Response — Complete the intake below</h4>
+          <div class="field-group"><label>Write your 3–5 key questions:</label><textarea id="s7_questions" name="s7_questions" placeholder="List your questions here…"></textarea></div>
+          <div class="field-group"><label>What information is still missing?</label><textarea id="s7_missing" name="s7_missing" placeholder="What else do you need to know before acting?"></textarea></div>
+          <div class="field-group"><label>Your initial next step based on what you know so far:</label><textarea id="s7_nextstep" name="s7_nextstep" placeholder="Describe your next action…"></textarea></div>
+        </div>
+        <div class="lock-row">
+          <button type="button" class="btn-lock" id="lock7-btn" onclick="lockScenario(7)">🔒 Lock My Responses</button>
+          <span class="lock-warning" id="lock7-warn">Please fill in all three fields before locking.</span>
+          <div class="locked-badge" id="lock7-badge"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 7H12V5A4 4 0 004 5v2H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1zM6 5a2 2 0 014 0v2H6V5zm2 7a1 1 0 110-2 1 1 0 010 2z" fill="#2E7D52"/></svg>Responses locked — ready to reveal model answer</div>
+        </div>
+        <button type="button" class="btn-reveal" id="reveal7-btn" onclick="toggleModel('model7','reveal7-btn')">👁 Reveal Model Answer</button>
+        <div id="model7" class="model-answer">
+          <h4>✅ Model Answer — Compare your responses below</h4>
+          <div class="model-section"><div class="model-section-title">Key Questions to Ask:</div><ul><li>How old is the kitten? (This is the most critical first question — answer this before anything else guides your response.)</li><li>When did the kitten last eat successfully, and how much did it take at that feeding?</li><li>Is the kitten still responsive when you pick it up — does it cry, root, or try to move?</li><li>Does the kitten feel warm or cold when you hold it?</li><li>Is the kitten breathing normally, or do you notice any labored or slow breathing?</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Information Still Needed:</div><ul><li>Whether the kitten is bottle-fed or with a mother, and if with a mother, whether the mother is accepting it</li><li>Whether other kittens in the litter are showing similar signs</li><li>Whether there have been any recent changes (temperature drop, formula change)</li></ul></div>
+          <div class="model-section"><div class="model-section-title">Initial Next Step:</div><div class="next-step">This is a potential Fading Kitten Syndrome case. Based on the description (really weak, won't feed), this defaults to at least Yellow and must be assessed for Red immediately. If the kitten is under 4 weeks, cold, or unresponsive: this is Red. Check the Internal Site for this organization's specific emergency protocol immediately — their instructions will specify whether to direct the foster to an emergency vet right away, or to contact the Foster Coordinator first for authorization and clinic direction. Whatever action is taken, document it in the Support Form. Do not advise the foster to "wait and see."</div></div>
+          <div class="model-section"><div class="model-section-title" style="color:var(--danger);">What Would Escalate This Case:</div><ul class="escalate-list"><li>Cold + unresponsive + not feeding in a neonatal kitten = Red — check Internal Site for org-specific emergency protocol immediately</li><li>Labored or slow breathing = Red</li><li>Not feeding for 4+ hours (under 2 weeks) or 6+ hours (2–4 weeks) = urgent intervention needed</li><li>If the foster says "something is wrong," trust it and treat as at least Yellow until proven otherwise</li></ul></div>
+          <div class="sw-table"><div class="sw-col sw-strong"><h5>✅ Strong Response Includes</h5><ul><li>Age is the first or second question (non-negotiable for neonates)</li><li>Last successful feeding time and amount is established</li><li>Responsiveness and muscle tone is assessed</li><li>Body temperature is checked</li><li>Response reflects the high-urgency default for this scenario, including correct Red protocol</li></ul></div><div class="sw-col sw-weak"><h5>❌ Weak Response Shows</h5><ul><li>Age is asked late or not at all</li><li>Responsiveness is not assessed</li><li>Body temperature is not checked</li><li>A "wait and see" recommendation is given</li><li>The org-specific emergency protocol from the Internal Site is not mentioned for Red signals</li></ul></div></div>
+        </div>
+        <div class="rubric-section" id="rubric7">
+          <h4>Self-Evaluation Rubric — Scenario 7</h4><p class="rubric-hint">Score yourself after reviewing the model answer above.</p>
+          <div class="rubric-row"><span class="rubric-num">1</span><div class="rubric-criterion">My questions cover at least 3 of the 4 core areas: what, when, frequency/severity, overall animal condition</div><div class="rubric-options"><label><input type="radio" name="s7_r1" value="1" onchange="updateScore(7)"> Met</label><label><input type="radio" name="s7_r1" value="0" onchange="updateScore(7)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">2</span><div class="rubric-criterion">All of my questions are specific and relevant to this symptom — no generic or irrelevant questions included</div><div class="rubric-options"><label><input type="radio" name="s7_r2" value="1" onchange="updateScore(7)"> Met</label><label><input type="radio" name="s7_r2" value="0" onchange="updateScore(7)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">3</span><div class="rubric-criterion">I did not give any recommendation before completing my questions</div><div class="rubric-options"><label><input type="radio" name="s7_r3" value="1" onchange="updateScore(7)"> Met</label><label><input type="radio" name="s7_r3" value="0" onchange="updateScore(7)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">4</span><div class="rubric-criterion">I correctly identified the most important missing information for this scenario</div><div class="rubric-options"><label><input type="radio" name="s7_r4" value="1" onchange="updateScore(7)"> Met</label><label><input type="radio" name="s7_r4" value="0" onchange="updateScore(7)"> Not Met</label></div></div>
+          <div class="rubric-row"><span class="rubric-num">5</span><div class="rubric-criterion">My initial next step is proportionate to what I know, and for any Red/urgent signals, I referenced checking the Internal Site for the org-specific emergency protocol</div><div class="rubric-options"><label><input type="radio" name="s7_r5" value="1" onchange="updateScore(7)"> Met</label><label><input type="radio" name="s7_r5" value="0" onchange="updateScore(7)"> Not Met</label></div></div>
+          <div class="score-pill" id="score7-display">Score: — / 5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overall + Submit -->
+    <div class="card">
+      <div class="overall-tracker">
+        <div class="tracker-label">Scenarios Passed (scored 4 or 5 out of 5)</div>
+        <div class="tracker-score" id="overall-score">— / 7</div>
+        <div class="tracker-sub" id="overall-sub">Lock and score each scenario above to update this count</div>
+      </div>
+      <p class="submit-hint">When you have scored all 7 scenarios, submit to record your results.</p>
+      <button type="submit" class="btn-submit" id="submitBtn">Submit Assessment</button>
+      <div class="submission-status" id="submissionStatus"></div>
+    </div>
+
+  </form>
+
+  <!-- Results card -->
+  <div class="results-card" id="resultsCard">
+    <div class="results-module-label">Module 5 Assessment</div>
+    <div class="score-display-big" id="scoreDisplay"></div>
+    <div class="score-total-line" id="scoreTotal"></div>
+    <div class="verdict" id="verdictText"></div>
+    <p class="results-note" id="resultsNote"></p>
+    <button class="btn-retake" onclick="location.reload()">Retake Assessment</button>
+  </div>
+
+</div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4s-rvKghwg6PFtvQHzNwq-IK70NhHWlt-jMSMWyIyd4st7kqeMkJjc5GOlXScjqO8vA/exec';
+  const PASS_SCENARIOS = 6;
+  const rubricScores = {1:null,2:null,3:null,4:null,5:null,6:null,7:null};
+
+  // Auto-fill today's date
+  document.getElementById('assessmentDate').value = new Date().toISOString().slice(0, 10);
+
+  function lockScenario(n) {
+    const fields = ['questions','missing','nextstep'];
+    let allFilled = true;
+    fields.forEach(f => {
+      const ta = document.getElementById('s' + n + '_' + f);
+      if (!ta.value.trim()) {
+        ta.classList.add('field-error-ta');
+        allFilled = false;
+      } else {
+        ta.classList.remove('field-error-ta');
+      }
+    });
+
+    const warn = document.getElementById('lock' + n + '-warn');
+    if (!allFilled) {
+      warn.style.display = 'inline';
+      return;
+    }
+    warn.style.display = 'none';
+
+    // Lock all three textareas
+    fields.forEach(f => {
+      const ta = document.getElementById('s' + n + '_' + f);
+      ta.disabled = true;
+      ta.classList.add('locked');
+    });
+
+    // Swap lock button for locked badge
+    document.getElementById('lock' + n + '-btn').style.display = 'none';
+    const badge = document.getElementById('lock' + n + '-badge');
+    badge.style.display = 'flex';
+
+    // Show reveal button
+    document.getElementById('reveal' + n + '-btn').style.display = 'block';
+  }
+
+  function toggleModel(modelId, btnId) {
+    const el = document.getElementById(modelId);
+    const btn = document.getElementById(btnId);
+    const hidden = el.style.display === 'none' || el.style.display === '';
+    el.style.display = hidden ? 'block' : 'none';
+    btn.textContent = hidden ? '✓ Model Answer Revealed — Collapse' : '👁 Reveal Model Answer';
+    btn.classList.toggle('revealed', hidden);
+
+    // Show rubric when model answer is revealed for the first time
+    if (hidden) {
+      const n = modelId.replace('model','');
+      document.getElementById('rubric' + n).classList.add('visible');
+      // Smooth scroll to rubric
+      setTimeout(() => {
+        document.getElementById('rubric' + n).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 150);
+    }
+  }
+
+  function updateScore(scenario) {
+    let count = 0;
+    let allAnswered = true;
+    for (let r = 1; r <= 5; r++) {
+      const sel = document.querySelector('input[name="s' + scenario + '_r' + r + '"]:checked');
+      if (!sel) { allAnswered = false; }
+      else if (sel.value === '1') count++;
+    }
+    rubricScores[scenario] = allAnswered ? count : null;
+
+    const display = document.getElementById('score' + scenario + '-display');
+    if (!allAnswered) {
+      display.textContent = 'Score: ' + count + ' / 5 (answer all criteria to finalize)';
+      display.className = 'score-pill';
+    } else {
+      let label = '', cls = 'score-pill ';
+      if (count === 5)      { label = ' — Excellent ✓'; cls += 'score-excellent'; }
+      else if (count === 4) { label = ' — Pass ✓';      cls += 'score-pass'; }
+      else if (count === 3) { label = ' — Review ⚠';   cls += 'score-review'; }
+      else                  { label = ' — Retake ✗';   cls += 'score-retake'; }
+      display.textContent = 'Score: ' + count + ' / 5' + label;
+      display.className = cls;
+    }
+    updateOverall();
+  }
+
+  function updateOverall() {
+    const passed = Object.values(rubricScores).filter(s => s !== null && s >= 4).length;
+    const scored = Object.values(rubricScores).filter(s => s !== null).length;
+    document.getElementById('overall-score').textContent = passed + ' / 7';
+    const sub = document.getElementById('overall-sub');
+    if (scored === 7) {
+      sub.textContent = passed >= PASS_SCENARIOS
+        ? '✓ Passing — ' + passed + ' scenarios scored 4 or 5'
+        : '⚠ ' + (PASS_SCENARIOS - passed) + ' more scenario(s) needed to pass';
+    } else {
+      sub.textContent = scored + ' of 7 scenarios fully scored';
+    }
+  }
+
+  document.getElementById('assessmentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let valid = true;
+
+    const name = document.getElementById('traineeName').value.trim();
+    const date = document.getElementById('assessmentDate').value;
+
+    if (!name) {
+      document.getElementById('traineeName').classList.add('field-error-input');
+      document.getElementById('nameError').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('traineeName').classList.remove('field-error-input');
+      document.getElementById('nameError').style.display = 'none';
+    }
+    if (!date) {
+      document.getElementById('assessmentDate').classList.add('field-error-input');
+      document.getElementById('dateError').style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById('assessmentDate').classList.remove('field-error-input');
+      document.getElementById('dateError').style.display = 'none';
+    }
+    if (!valid) {
+      document.querySelector('.field-error-input').scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
+
+    const scenariosPassed = Object.values(rubricScores).filter(s => s !== null && s >= 4).length;
+    const passed = scenariosPassed >= PASS_SCENARIOS;
+    const timestamp = new Date().toISOString();
+
+    const answers = {};
+    for (let s = 1; s <= 7; s++) {
+      answers['s' + s + '_questions'] = document.getElementById('s' + s + '_questions').value;
+      answers['s' + s + '_missing']   = document.getElementById('s' + s + '_missing').value;
+      answers['s' + s + '_nextstep']  = document.getElementById('s' + s + '_nextstep').value;
+      answers['s' + s + '_score']     = rubricScores[s] !== null ? rubricScores[s] : 'not scored';
+    }
+
+    const payload = {
+      module: 'Module 5',
+      name, date, timestamp,
+      quiz_score: scenariosPassed,
+      quiz_total: 7,
+      percentage: Math.round((scenariosPassed / 7) * 100),
+      result: passed ? 'Pass' : 'Review',
+      ...answers
+    };
+
+    const statusEl = document.getElementById('submissionStatus');
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    statusEl.className = 'submission-status sending';
+    statusEl.textContent = 'Submitting your assessment…';
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      statusEl.className = 'submission-status sent';
+      statusEl.textContent = '✓ Assessment submitted successfully.';
+    } catch (err) {
+      statusEl.className = 'submission-status failed';
+      statusEl.textContent = 'Submission error. Please try again or contact your supervisor.';
+      submitBtn.disabled = false;
+      return;
+    }
+
+    setTimeout(() => {
+      document.getElementById('assessmentForm').style.display = 'none';
+      const card = document.getElementById('resultsCard');
+      card.style.display = 'block';
+      card.className = 'results-card ' + (passed ? 'pass' : 'retake');
+      const sd = document.getElementById('scoreDisplay');
+      sd.textContent = scenariosPassed;
+      sd.className = 'score-display-big ' + (passed ? 'pass' : 'retake');
+      document.getElementById('scoreTotal').textContent = '/ 7 scenarios passed';
+      const v = document.getElementById('verdictText');
+      v.className = 'verdict ' + (passed ? 'pass' : 'retake');
+      v.textContent = passed ? '✓ Pass' : '✗ Review Required';
+      document.getElementById('resultsNote').textContent = passed
+        ? 'Great work, ' + name + '! You passed Module 5 with ' + scenariosPassed + ' of 7 scenarios scored 4 or 5. You may now proceed to Module 6.'
+        : 'You passed ' + scenariosPassed + ' of 7 scenarios. A score of 4 or 5 on at least 6 scenarios is required. Please re-read the relevant symptom sections and redo the flagged exercises before moving to Module 6.';
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 800);
+  });
+</script>
+</body>
+</html>
