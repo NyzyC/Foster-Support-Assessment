@@ -551,6 +551,9 @@
   const TOTAL = 35;
   const PASS_SCORE = 28;
 
+  // Auto-fill today's date
+  document.getElementById('assessmentDate').value = new Date().toISOString().slice(0, 10);
+
   const ANSWER_KEY = {
     q1:'B', q2:'B', q3:'C', q4:'C', q5:'C',
     q6:'C', q7:'B', q8:'B', q9:'B', q10:'C',
@@ -679,7 +682,7 @@
 
       const note = document.getElementById('resultsNote');
       if (passed) {
-        note.textContent = 'Great work, ' + name + '! You've passed Module 3. You may now proceed to Module 4.';
+        note.textContent = 'Great work, ' + name + "! You've passed Module 3. You may now proceed to Module 4.";
       } else {
         note.textContent = 'You scored ' + score + ' out of ' + TOTAL + '. A score of ' + PASS_SCORE + ' or higher is required to pass. Please review the module material and retake when ready.';
       }
