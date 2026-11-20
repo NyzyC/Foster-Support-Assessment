@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case of the Day — Doobert Connect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+/* Matches the Doobert Connect Learning Portal (Google Site): Poppins, orange buttons, blue headings. */
+:root{
+  --orange:#F0592B; --orange-dark:#D44A20; --orange-soft:#FFF1EC;
+  --blue:#4A7DB0; --blue-dark:#355E8A; --blue-soft:#EAF1F8;
+  --ink:#2C2C2C; --ink-2:#666; --line:#E2E2E2; --bg:#F2F2F2; --white:#FFFFFF;
+  --green:#2E7D52; --green-soft:#E6F4EA; --amber:#9A6700; --amber-soft:#FFF4D6; --red:#C0392B; --red-soft:#FDE8E6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Poppins",Arial,sans-serif;font-size:15px;line-height:1.6}
+h1,h2,h3,h4,h5{margin:0;line-height:1.25}
+p{margin:0}
+.container{max-width:860px;margin:0 auto;padding:24px 16px 48px;display:grid;gap:18px}
+.header{background:var(--orange);color:#fff;padding:24px 28px;border-radius:8px}
+.header h1{font-size:26px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.header p{font-size:14px;opacity:.95;margin-top:4px}
+.card{background:var(--white);border-radius:8px;padding:24px 28px;box-shadow:0 1px 4px rgba(0,0,0,.07);display:grid;gap:14px}
+.step-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.num{width:30px;height:30px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+.step-h h2{font-size:19px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.3px}
+.step-h .time{margin-left:auto;font-size:13px;color:var(--ink-2)}
+.k{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-2);font-weight:600}
+.info{background:var(--orange-soft);border-left:4px solid var(--orange);padding:14px 18px;border-radius:0 6px 6px 0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 18px;margin:0}
+.facts dt{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-2);font-weight:600}
+.facts dd{margin:2px 0 0;font-weight:600}
+.kp{margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));column-gap:24px;border:1px solid var(--line);border-radius:6px;padding:4px 16px}
+.kp div{padding:9px 0;border-bottom:1px solid var(--line);min-width:0}
+.kp dt{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--blue);font-weight:600}
+.kp dd{margin:2px 0 0;font-size:14px}
+label,.lbl{font-weight:600;font-size:14.5px;display:block}
+.help{font-size:13px;color:var(--ink-2)}
+input[type=text],textarea{width:100%;padding:10px 13px;border:1.5px solid var(--line);border-radius:6px;font:inherit;font-size:14px;color:var(--ink);background:#fff}
+textarea{min-height:110px;resize:vertical}
+#plan{min-height:150px}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,125,176,.15)}
+textarea:disabled,input:disabled{background:#FAFAFA;color:var(--ink-2)}
+.count{font-size:12.5px;color:var(--ink-2)}
+.count.ok{color:var(--green);font-weight:600}
+.field{display:grid;gap:6px}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{position:relative}
+.tag input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.tag span{display:inline-flex;gap:6px;align-items:center;border:1.5px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13.5px;font-weight:500;cursor:pointer;background:#fff}
+.tag span::before{content:"+";font-weight:700;color:var(--ink-2)}
+.tag input:checked+span{border-color:var(--blue);background:var(--blue-soft);color:var(--blue-dark)}
+.tag input:checked+span::before{content:"✓";color:var(--blue)}
+.tag input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.rtag{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:500}
+.rtag.key{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+.rtag.extra{border-style:dashed;color:var(--ink-2)}
+.btn{font:inherit;font-weight:600;font-size:15px;border:none;border-radius:4px;padding:11px 22px;cursor:pointer;background:var(--orange);color:#fff}
+.btn:hover:not(:disabled){background:var(--orange-dark)}
+.btn:disabled{background:#CCC;cursor:not-allowed}
+.btn.secondary{background:var(--blue)}
+.btn.secondary:hover:not(:disabled){background:var(--blue-dark)}
+.btn.wide{width:100%;padding:15px;font-size:16px;font-weight:700}
+.btn:focus-visible,.qopt:focus-visible,.rate:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.row small{color:var(--ink-2);font-size:13px}
+.locked{border:1.5px dashed var(--line);border-radius:6px;padding:16px;text-align:center;color:var(--ink-2);font-size:14px}
+.box{border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:grid;gap:8px}
+.box h3{font-size:15px;color:var(--blue);font-weight:700}
+.box ul{margin:0;padding-left:1.2em;display:grid;gap:3px;font-size:14px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:14px;cursor:pointer}
+.check input{margin-top:4px;accent-color:var(--blue);width:16px;height:16px;flex:none}
+.model{background:var(--blue-soft);border-radius:6px;padding:10px 14px;font-size:14px}
+.takeaway{background:var(--blue);color:#fff;border-radius:6px;padding:14px 18px}
+.takeaway .k{color:#DCE8F4}
+.takeaway p{font-weight:600;margin-top:2px}
+.small{font-size:13px;color:var(--ink-2)}
+details summary{cursor:pointer;font-weight:600;color:var(--blue)}
+details[open] summary{margin-bottom:10px}
+.rec{border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:10px}
+.rec-h{padding:8px 14px;background:#F7F7F7;font-size:13px;font-weight:600;color:var(--ink-2)}
+.thread{padding:12px 14px;display:grid;gap:8px;max-height:480px;overflow-y:auto;font-size:14px}
+.msg .who{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-2)}
+.msg.a .who{color:var(--orange)}
+.msg .b{white-space:pre-wrap;overflow-wrap:anywhere}
+.fu{border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:grid;gap:8px}
+.fu .q{font-weight:600}
+.rates{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rate{font:inherit;font-size:13.5px;font-weight:600;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:5px 14px;cursor:pointer}
+.rate[aria-pressed=true].got{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.rate[aria-pressed=true].part{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
+.rate[aria-pressed=true].miss{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.qz{border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:grid;gap:8px}
+.qz .q{font-weight:600}
+.qopt{font:inherit;font-size:14px;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:6px;padding:9px 13px;cursor:pointer}
+.qopt:hover:not(:disabled){border-color:var(--blue);background:var(--blue-soft)}
+.qopt:disabled{cursor:default}
+.qopt.right{border-color:var(--green);background:var(--green-soft)}
+.qopt.wrong{border-color:var(--red);background:var(--red-soft)}
+.why{font-size:13.5px;color:var(--ink-2)}
+.status{text-align:center;padding:10px 14px;border-radius:6px;font-size:14px}
+.status.sending{background:var(--blue-soft);color:var(--blue-dark)}
+.status.sent{background:var(--green-soft);color:var(--green)}
+.status.failed{background:var(--red-soft);color:var(--red)}
+.result{text-align:center;padding:36px 24px;border-top:6px solid var(--green)}
+.result.review{border-top-color:#E0A100}
+.result.oneonone{border-top-color:var(--red)}
+.result .big{font-size:40px;font-weight:800;color:var(--green)}
+.result.review .big{color:var(--amber)}
+.result.oneonone .big{color:var(--red)}
+.result .score{font-size:18px;color:var(--ink-2)}
+.result p{max-width:520px;margin:10px auto 0;color:var(--ink-2);font-size:14px}
+[hidden]{display:none!important}
+@media (max-width:600px){.card{padding:18px 16px}.header{padding:20px}.header h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Case of the Day</h1>
+    <p id="weekLine">Doobert Connect Continuous Education</p>
+  </div>
+
+  <div class="card">
+    <div class="info">
+      <p><strong>One real case a week. About 35 minutes, no more than 45.</strong></p>
+      <p class="small" style="margin-top:4px">Read the situation, plan how you’d handle it, compare with what the agent did, practice what you missed, then submit. A score of 80 or more is a pass. Your result is recorded automatically.</p>
+    </div>
+    <div class="field">
+      <label for="name">Your full name *</label>
+      <input type="text" id="name" autocomplete="name" placeholder="Your full name">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step-h"><span class="num">1</span><h2>The situation</h2><span class="time">About 3 min</span></div>
+    <h3 id="title" style="font-size:18px"></h3>
+    <dl class="facts" id="facts"></dl>
+    <div class="info"><p id="situation"></p></div>
+    <div class="k">Key points from the conversation</div>
+    <dl class="kp" id="keyPoints"></dl>
+  </div>
+
+  <div class="card">
+    <div class="step-h"><span class="num">2</span><h2>Your approach</h2><span class="time">About 8 min</span></div>
+    <div class="field">
+      <label for="qs">What questions would you ask the foster?</label>
+      <span class="help">Write 2 to 5 questions, one per line. Think about what you’d need to know before giving advice.</span>
+      <textarea id="qs" placeholder="When did this start?&#10;Is he eating and drinking?"></textarea>
+      <span class="count" id="qsCount"></span>
+    </div>
+    <div class="field">
+      <span class="lbl" id="placesLbl">Where would you look?</span>
+      <span class="help">Pick only what you’d really check for this case. Checking too many places wastes time.</span>
+      <div class="tags" id="places" role="group" aria-labelledby="placesLbl"></div>
+    </div>
+    <div class="field">
+      <label for="plan">What would you tell the foster, and what would you do next?</label>
+      <span class="help">At least 300 characters: your advice, the red flags you’d give, and how you’d route it to the organization.</span>
+      <textarea id="plan" placeholder="I’d tell her to… If she sees…, she should… I’d relay it to… as … priority."></textarea>
+      <span class="count" id="planCount"></span>
+    </div>
+    <div class="row"><button class="btn" id="lockBtn" type="button" disabled>Lock in my approach</button><small id="gateMsg"></small></div>
+  </div>
+
+  <div id="locked" class="card"><div class="locked">Lock in your approach in step 2 to see what happened and continue.</div></div>
+
+  <div id="after" hidden style="display:grid;gap:18px">
+    <div class="card">
+      <div class="step-h"><span class="num">3</span><h2>What happened</h2><span class="time">About 7 min</span></div>
+      <div class="box"><h3>Summary</h3><p id="summary" style="font-size:14px"></p><p class="small" id="priority"></p></div>
+      <details><summary>Read the full call, text or email</summary><div id="records"></div><p class="small">Dialpad writes call transcripts automatically, so names are often misspelled.</p></details>
+      <div class="two">
+        <div class="box"><h3>What the agent did well</h3><ul id="good"></ul></div>
+        <div class="box"><h3>To make it even better</h3><ul id="better"></ul></div>
+      </div>
+      <div class="box">
+        <h3>Check yourself: which of these did you ask?</h3>
+        <p class="small">Tick only the ones your questions in step 2 covered. Be honest; this is part of your score.</p>
+        <div id="selfCheck" style="display:grid;gap:6px"></div>
+        <details><summary>Show what you wrote</summary><p class="small" style="white-space:pre-wrap" id="yourQs"></p><p class="small" style="white-space:pre-wrap;margin-top:8px" id="yourPlan"></p></details>
+      </div>
+      <div class="box"><h3>A strong plan for this case</h3><p class="model" id="ideal"></p></div>
+      <div class="box"><h3>Where to look for this case</h3><div class="tags" id="placesResult"></div><p class="small">Green: the places that answer this case. Dashed: not needed here.</p></div>
+      <div class="takeaway"><div class="k">Takeaway</div><p id="takeaway"></p></div>
+      <p class="small"><strong>Org protocol:</strong> <span id="protocol"></span></p>
+    </div>
+
+    <div class="card">
+      <div class="step-h"><span class="num">4</span><h2>Practice</h2><span class="time">About 10 min</span></div>
+      <p class="help">Answer each question in a few sentences (at least 60 characters), then show the model answers and rate yourself honestly.</p>
+      <div id="fuBody" style="display:grid;gap:12px"></div>
+    </div>
+
+    <div class="card">
+      <div class="step-h"><span class="num">5</span><h2>Quick check</h2><span class="time">About 4 min</span></div>
+      <div id="quizBody" style="display:grid;gap:12px"></div>
+    </div>
+
+    <div class="card">
+      <div class="step-h"><span class="num">6</span><h2>Your learning summary</h2></div>
+      <p class="help">Everything you missed in one place. Read it before you reflect.</p>
+      <div id="recap" style="display:grid;gap:12px"></div>
+    </div>
+
+    <div class="card">
+      <div class="step-h"><span class="num">7</span><h2>Reflect</h2><span class="time">About 3 min</span></div>
+      <div class="field">
+        <label for="reflect">Looking at your learning summary, what’s one thing you’ll do differently on your next live case, and why?</label>
+        <textarea id="reflect" placeholder="Next time I’ll… because…"></textarea>
+        <span class="count" id="reflectCount"></span>
+      </div>
+    </div>
+
+    <div class="card" id="submitCard">
+      <p class="small" style="text-align:center" id="submitHint">Finish steps 4 to 7, then submit. You can’t change your answers after submitting.</p>
+      <button class="btn wide" id="submitBtn" type="button" disabled>Submit</button>
+      <div class="status" id="status" hidden></div>
+    </div>
+
+    <div class="card result" id="resultCard" hidden>
+      <div class="k">This week’s result</div>
+      <div class="big" id="resBig"></div>
+      <div class="score" id="resScore"></div>
+      <p id="resNote"></p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // ═══════════════════════════════════════════════════════════════
+  // CONFIGURATION: paste the Apps Script Web App URL below
+  // (see "Case of the Day – Apps Script" in the same Drive folder).
+  // ═══════════════════════════════════════════════════════════════
+  const SCRIPT_URL = 'PASTE_APPS_SCRIPT_URL_HERE';
+
+  const RECS = {"orion": [{"kind": "call", "label": "Dialpad call · 2:21 PM ET · 8 min", "lines": [{"w": "a", "t": "2:21 PM", "x": "Hi, this is Bernadine with Dober how can I help?"}, {"w": "f", "t": "2:21 PM", "x": "Hi, good afternoon. My name is Karman fostering some kittens for Miami animal shelter. I made an appointment today and I took him because he wasn't eating and he wasn't necessarily gaining weight. He's about 1112 days old and they said they tested him and that he was fine. They gave him nutr but now that I was trying to feed him again, I noticed that he's open mouth breathing."}, {"w": "a", "t": "2:22 PM", "x": "Mm-hmm."}, {"w": "f", "t": "2:22 PM", "x": "And it looks like he's really, it takes a lot for him to just breathe."}, {"w": "a", "t": "2:22 PM", "x": "Okay. Just to make sure that we're on the same page. So you made an appointment today to Miami-Dade right? And then so they tested him, said he's fine but then when you gave him the electric call, he is now open mouth breathing correct?"}, {"w": "f", "t": "2:23 PM", "x": "The nurse, the nurse gave him the electrical at the shelter."}, {"w": "a", "t": "2:23 PM", "x": "Okay. So I'll just be asking a few more questions. Okay? Just kindly bear me. How may I know when did you start noticing that? He is open mouth breathing."}, {"w": "f", "t": "2:23 PM", "x": "How long have I noticed that?"}, {"w": "a", "t": "2:23 PM", "x": "Mm-hmm. Alright."}, {"w": "f", "t": "2:23 PM", "x": "Well, he was in the terrier and about I want to say almost an hour, not even an hour like thirty minutes ago. I was warming up some stuff and I was like, cleaning his butt and everything was fine, while I was getting his formula ready. I noticed that he was having a hard time breathing. And I currently, I'm at my work and I work for an animal hospital. So we put him in an oxygen cage but he's still breathing the car."}, {"w": "a", "t": "2:24 PM", "x": "Mm-hmm. Okay. That's his belly or chest moving with each bread."}, {"w": "f", "t": "2:24 PM", "x": "It mean Abo and what looks like it's moving a lot."}, {"w": "a", "t": "2:24 PM", "x": "Okay."}, {"w": "f", "t": "2:24 PM", "x": "I'm calling the shelter, because. He's not going to make it. I don't want him not making it in my house."}, {"w": "a", "t": "2:24 PM", "x": "Is he still responsive moving normally mm-hmm."}, {"w": "f", "t": "2:24 PM", "x": "Oh, he's trying to move like, you can see that he's trying to move around but he's just, like, he's, you know, his chest is like, he's like, it's hard for him to breathe."}, {"w": "a", "t": "2:25 PM", "x": "May I know the color of his gums or tongue like are they pin, pale gray or bluish?"}, {"w": "f", "t": "2:25 PM", "x": "Yeah, they're pink. My one of my vets looked at him and he looked, he looks like they look like a pink. Like, she said that they didn't look purple or anything. And from what I saw, they didn't look any other color than pink either."}, {"w": "a", "t": "2:25 PM", "x": "Okay. Has he been able to nurse or take formula since returning from the appointment?"}, {"w": "f", "t": "2:25 PM", "x": "From we returned from the appointment like around 1:00 PM and I try to nurse him right now at 2:00 PM."}, {"w": "a", "t": "2:25 PM", "x": "Mm-hmm."}, {"w": "f", "t": "2:25 PM", "x": "And this is when he just, he just looks like he went downhill."}, {"w": "a", "t": "2:26 PM", "x": "Okay. So. The return from the appointment around 1:00 PM and then you bottle fed him at around 2:00 PM, right? And then."}, {"w": "f", "t": "2:26 PM", "x": "No, I can't battle him because he doesn't take the bottle. I try to syringe him and he and he was like pushing me away. He didn't want to open his mouth so then, that's when I took him to my doctor and asked her to check and she was like, look that way that he's opening his mouth, he's breathing like he's open mouth breathing. It was really like little tiny gas and then."}, {"w": "a", "t": "2:26 PM", "x": "Mm-hmm. Okay."}, {"w": "f", "t": "2:26 PM", "x": "She looked at him and then she said we need to need to call the shelter and they put him in oxygen in the meantime."}, {"w": "a", "t": "2:27 PM", "x": "Okay. Alright. Well for now I would advise to bring her in to the shelter within a business, until their business hours as soon as possible. And then I'll also coordinate with the mia team that you've reached out with an update that your foster kitten is having a labored breathing currently may I know the animal name and the animal ID if available please."}, {"w": "f", "t": "2:27 PM", "x": "Yes, the ID is a as in apple, 283-3692."}, {"w": "a", "t": "2:27 PM", "x": "Mm-hmm. Okay, I've got A and then the number is 283-3692 correct so far?"}, {"w": "f", "t": "2:27 PM", "x": "Yes."}, {"w": "a", "t": "2:27 PM", "x": "Okay. May I also have the name is the kid you have? Oh, Ryan."}, {"w": "f", "t": "2:27 PM", "x": "His name is Orion. O-R-I-O-N."}, {"w": "a", "t": "2:28 PM", "x": "Okay, alright. Also is your first and last name [foster’s full name]?"}, {"w": "f", "t": "2:28 PM", "x": "Yes."}, {"w": "a", "t": "2:28 PM", "x": "Okay, got it. And is the email address or is your email address? [foster’s email] just wanted to make sure that I have all of the information to share with the Miami date? Okay, got it. Alright, so yeah, be safe on your way to the, on your way back to the Miami day team. So, and also if there'll be any sudden changes or worst thing just kindly reach out to us so that we can update that, okay?"}, {"w": "f", "t": "2:28 PM", "x": "Yes, yes. And so let me ask you when I head over there, do I let them know that I don't have an appointment?"}, {"w": "a", "t": "2:28 PM", "x": "Yes no worries about that. Since he is currently having labor, breathing, right? And even though you've shared that you currently have him on an oxygen cage and it's not doing, you know, he's not improving. Then I am considering this as a high priority. So in cases like this we can direct fosters directly to the shelter clinic within their business hours. And like what I said, I'll make sure that everything is well coordinated with the Miami day team."}, {"w": "f", "t": "2:29 PM", "x": "Okay. So I'm gonna, I'm gonna go now and take him. I should be there in the next 101015 minutes, I believe."}, {"w": "a", "t": "2:29 PM", "x": "Okay, alright, and also Kylie do not attempt to like a feed him again or give him anything since he's having a hard time breathing. Okay, and thank you and be safe again you're more than welcome to reach out in case you need anything. Thank you."}, {"w": "f", "t": "2:29 PM", "x": "Okay. All right. Thank you so much."}, {"w": "a", "t": "2:30 PM", "x": "You're more than welcome. Thank you."}, {"w": "f", "t": "2:30 PM", "x": "Bye-bye."}]}], "pinto": [{"kind": "call", "label": "Dialpad call · 10:20 PM ET · 7 min", "lines": [{"w": "a", "t": "10:20 PM", "x": "Thank you for calling debt, this is Trish. How can I assist?"}, {"w": "f", "t": "10:20 PM", "x": "Hi, I'm foster with Hubert's animal shelter. And I have a rabbit who bit into an ice pack. It's like a clay based ice pack. I don't know if she ate anything, she's running around like a nut. She's very happy right now but I don't know."}, {"w": "a", "t": "10:20 PM", "x": "Oh. No worries with this one. Let me help you reassess the situation of the rabbit just wanted to also have your full name."}, {"w": "f", "t": "10:21 PM", "x": "Rachel [last name]."}, {"w": "a", "t": "10:21 PM", "x": "Okay, and by the way, I'm sorry, Rachel but can you spell out to me your whole name so that I have the correct information?"}, {"w": "f", "t": "10:21 PM", "x": "Yes. [spells her full name]"}, {"w": "a", "t": "10:21 PM", "x": "Okay, thank you so much. And by the way, can I also have the Robert's name and do you happen to have the animal ID?"}, {"w": "f", "t": "10:21 PM", "x": "Yes, her name is Pinto like the bean and her animal ID is a 006-171-1297."}, {"w": "a", "t": "10:21 PM", "x": "Mm-hmm. Mm-hmm. Okay. And this is a rabbit. Right? Okay, got it. Hold on for a moment. Let me just pull up the organization on my end. Just stay on the line."}, {"w": "f", "t": "10:21 PM", "x": "Correct. Yeah, no worries."}, {"w": "a", "t": "10:22 PM", "x": "Mm-hmm and you mentioned earlier it's like clear mm-hmm hold on let me just check this one. Okay. So, by the way Rachel I just have some few more questions to see what's really going on with a Pino. So, first I also wanted to check if you all you see him really bit, the clay pack just to confirm."}, {"w": "f", "t": "10:22 PM", "x": "Yeah, there's a hole in it."}, {"w": "a", "t": "10:22 PM", "x": "Oh, alright and do you still have the ice pack or the packaging?"}, {"w": "f", "t": "10:22 PM", "x": "Yeah, we threw it out but I can get it."}, {"w": "a", "t": "10:22 PM", "x": "Okay, and by the way, do you actually see her swallow any of the contents or are you okay, and by the way, just to confirm as well about how much of the ice pack do you think Pina have chewed or swallowed?"}, {"w": "f", "t": "10:22 PM", "x": "I did not, I did not. I'm not sure I would guess a very small amount if anything."}, {"w": "a", "t": "10:23 PM", "x": "Okay, that's kind of reassuring to know. And how long ago did this happen?"}, {"w": "f", "t": "10:23 PM", "x": "Yeah. Like twenty minutes ago."}, {"w": "a", "t": "10:23 PM", "x": "Oh, just twenty minutes ago and by the way, Rachel is Pinter still behaving normally or in moving around as well. Okay, and has she been okay, thank you. And by the way, yeah, because it's honestly Rachel, I'm kinda happy to receive a call with an animal that's that is rabbit, because we usually, I usually handle some kittens and it's kind of unique. And also is Pino is still eating and drinking. Normally after this happened."}, {"w": "f", "t": "10:23 PM", "x": "Yeah, yeah, she's zooming around the house. Yeah. Yeah I gave her, I gave her some water immediately after and I put like a splash of juice in it so she drank a lot of it and she is eating."}, {"w": "a", "t": "10:23 PM", "x": "Mm-hmm. Okay. Okay, that's nice. And lastly I wanted to check this one. Rachel have you noticed any drawing polling at her mouth? Unusual chewing there bloating or changes and her behavior."}, {"w": "f", "t": "10:24 PM", "x": "Currently. No, I don't think so."}, {"w": "a", "t": "10:24 PM", "x": "Okay, so lastly before I put you on hold to gather all the information that you've given to me, may I also request racial the packaging. If you can take a photo of that and you and which also included the product label and the damage I speak so that I can also relate that to the shelter team and you can send it to the phone number that you're calling in after our call."}, {"w": "f", "t": "10:24 PM", "x": "Oh, okay. Cool. Yeah, I can do that."}, {"w": "a", "t": "10:24 PM", "x": "Okay, so, yup Rachel let me just put you on hold just for a minute or two let me just compile all the details about what happened with Pinto so that I can really relay the full contact to the shelter team, okay? Okay? Just stay on the line, hold on for a moment."}, {"w": "f", "t": "10:25 PM", "x": "Gotcha. Yes."}, {"w": "a", "t": "10:25 PM", "x": "Hi Rachel, are you still on the line. Thank you so much for patiently holding. So I already have all the information that I needed to relate to the shelter team to set expectation at the Saint Ebert it's just gonna review this one first and they're gonna reach out to you directly for further guidance and what to do next with Pino. So for this the maximum for them to reach out racial would be like 24 business hours but honestly they reach out as soon as they are done reviewing the case but yeah, well from the guidance from the shelter team Rachel I know you're gonna, you're already doing this one but yeah, just remove the damage ice pack and make sure Pinto cannot access and remaining content and just keep the ice back and it's original packaging so that if the she needed that you can provide it to."}, {"w": "f", "t": "10:25 PM", "x": "Okay. Okay. Okay. Yeah."}, {"w": "a", "t": "10:26 PM", "x": "Them and also just keep fresh water and her usual hay available and just monitor her eating, drinking droppings and behavior closely and also avoid giving any medication home remedies or anything intended to counteract the symptoms and less directed by the same Uber or the vet, okay, and also don't try to induce vomiting or pho, feed her. And if ever you see any worsening on her condition or changes on pins condition condition don't hesitate to call us back even just a text. It's fine, Rachel so we can notify the saus animal shelter tea."}, {"w": "f", "t": "10:26 PM", "x": "Yeah. Yeah. Okay, sounds good. I think, I mean, honestly, I think she's fine. She's right now. She's eating a lot of hay and Pooping, so."}, {"w": "a", "t": "10:27 PM", "x": "Am mm-hmm? Oh, that's cute. Mm-hmm."}, {"w": "f", "t": "10:27 PM", "x": "But I just wanted to call just in case."}, {"w": "a", "t": "10:27 PM", "x": "Yeah, it's important as well that the Zuber or the shelter is aware of what happened today so they can provide you further guidance on that."}, {"w": "f", "t": "10:27 PM", "x": "Yeah. Yeah, sounds good. Thank you so much."}, {"w": "a", "t": "10:27 PM", "x": "Thank you, a, thank you so much for taking care of Pinto."}, {"w": "f", "t": "10:27 PM", "x": "Have a good one."}, {"w": "a", "t": "10:27 PM", "x": "You too bye-bye."}]}, {"kind": "sms", "label": "Dialpad texts after the call · 10:29–10:31 PM ET", "lines": [{"w": "f", "t": "10:29 PM", "x": "[photo]"}, {"w": "f", "t": "10:29 PM", "x": "[photo]"}, {"w": "f", "t": "10:29 PM", "x": "for Pinto (rabbit) possible ingestion (she bit a hole into it)"}, {"w": "a", "t": "10:31 PM", "x": "Thank you for sending this over, Rachael! I'll add this to our documentation. Have a good rest of your day!"}]}], "sammy": [{"kind": "sms", "label": "Dialpad texts · 7:34–7:46 PM ET", "lines": [{"w": "f", "t": "7:34 PM", "x": "Hi. I'm fostering a Rottweiler Sammy. On his walk today it seemed as if something hurt his paw. He keeps licking it. It looks like he has a little cut between his paw. Is there anything I can do?"}, {"w": "f", "t": "7:35 PM", "x": "[photo]"}, {"w": "a", "t": "7:38 PM", "x": "Hi Casi! Thank you for sending the photo! ❤️ I just have a few questions to better understand how Sammy is doing:\n-Is he putting weight on the affected paw and walking normally, or have you noticed any limping?\n-Is he continuously licking or chewing at the area?\n-Have you noticed any swelling, redness, or bleeding around the scratch?\n-Does he seem uncomfortable or show any signs of pain when walking?"}, {"w": "f", "t": "7:39 PM", "x": "He was walking fine but yes he is sitting he's continuously licking and biting it."}, {"w": "f", "t": "7:40 PM", "x": "I was able to clean it off and there was a little blood. It looks like a scab came off. I don't see anything on the underneath just the top. But he keeps licking the bottom too."}, {"w": "a", "t": "7:42 PM", "x": "Thank you for the additional update, Casi! I appreciate you taking the time to clean the area and check Sammy's paw. Since a little bleeding occurred when the scab came off and he's still licking and biting both the top and bottom of his paw, let's try to prevent him from irritating the area further."}, {"w": "a", "t": "7:42 PM", "x": "For now, you can:\n-Gently clean the area with saline solution or clean water and pat it dry.\n-If there's any minor bleeding, apply gentle pressure with clean gauze.\n-Try to prevent him from licking or chewing the paw. An e-collar may help if you have one available.\n-Keep the paw clean and dry, and limit activity to short potty breaks for now.\n-Avoid applying alcohol, hydrogen peroxide, or any medication unless directed by the shelter/veterinary team."}, {"w": "a", "t": "7:42 PM", "x": "Please continue monitoring for swelling, redness, discharge, renewed bleeding, limping, or signs of pain.\n\nI'll relay the photo and your updates to the Miami-Dade team so they're aware and can provide further guidance on Sammy's paw. Thank you again for taking such good care of him! ❤️"}, {"w": "f", "t": "7:43 PM", "x": "Should I bring him in for a visit? Or it's not necessary"}, {"w": "a", "t": "7:45 PM", "x": "That's a good question, Casi! ❤️ Since Sammy is still walking normally and the injury appears relatively minor based on what you've described, it's reassuring for now. However, given that he's continuously licking and biting the area, we'd like to have the Miami-Dade team review the photo and your updates before determining whether an in-person visit is needed.\n\nFor now, let's wait for their guidance. Kindly allow the shelter team some time to review the information. They will reach out to you directly within a maximum of 24 business hours with further guidance."}, {"w": "f", "t": "7:45 PM", "x": "Ok sounds good"}, {"w": "a", "t": "7:46 PM", "x": "Thank you, Casi 🐾"}]}], "willis": [{"kind": "call", "label": "Dialpad call · 3:31 PM ET · 5 min", "lines": [{"w": "a", "t": "3:32 PM", "x": "Hi, thank you for contacting. Luber, connect my name is be. How can I help?"}, {"w": "f", "t": "3:32 PM", "x": "Hey, they said to give you guys a call to see if we wanted to foster animals for short-term. They sent me an email about this, but I didn't know what to do, so I thought I'd give you a call."}, {"w": "a", "t": "3:32 PM", "x": "Okay. May I know from which shelter or organization that you wanted to foster animals with?"}, {"w": "f", "t": "3:32 PM", "x": "It was the I think it's called the SPCA in Cincinnati, Ohio."}, {"w": "a", "t": "3:32 PM", "x": "Okay, just one moment. Is that the one in Conry road, Cincinnati."}, {"w": "f", "t": "3:33 PM", "x": "Yes, that is one of them. Yeah."}, {"w": "a", "t": "3:33 PM", "x": "Okay, so I'll just gather all of hang on just one moment let me here. Are you already registered a foster through STC?"}, {"w": "f", "t": "3:33 PM", "x": "Well, I filled out the application online and they sent me an email but I don't know what else to do after that."}, {"w": "a", "t": "3:33 PM", "x": "Okay, is your full name Adam [last name]."}, {"w": "f", "t": "3:33 PM", "x": "Yep, that's my name."}, {"w": "a", "t": "3:33 PM", "x": "Okay. May I know if you already have like, you know, an animal in mind that you wanted to foster dogs. Okay."}, {"w": "f", "t": "3:33 PM", "x": "It's dogs, not cats because I already have a cat and I don't want to feel left out. But you know, I, any male dog would do, really anyone who needs help or needs home. You know, any older dog. I can take care of for a week and then help another dog and then another dog, etc. Etc, I don't have one in mind. Do I have to choose?"}, {"w": "a", "t": "3:33 PM", "x": "Mm-hmm. Mm-hmm. No, I'm just asking because I'll be sharing the information with the shelter team."}, {"w": "f", "t": "3:34 PM", "x": "Gotcha. Okay. Well, there was a dog called Willis over there. It looks like he's in kennel two."}, {"w": "a", "t": "3:34 PM", "x": "So will this with one?"}, {"w": "f", "t": "3:34 PM", "x": "Two, LW I. L. L. I. S."}, {"w": "a", "t": "3:34 PM", "x": "Okay. Do you have the animal ID of will so that I can let them know that mm-hmm."}, {"w": "f", "t": "3:35 PM", "x": "Yes, it's yeah, it's 60550317."}, {"w": "a", "t": "3:35 PM", "x": "It's 6051 oh."}, {"w": "f", "t": "3:35 PM", "x": "503."}, {"w": "a", "t": "3:35 PM", "x": "17. Okay, so it's 60550317, right. Okay. Anything else that I can help you with apart from, you know, if you wanted to potentially foster boilers and for the next step mm-hmm."}, {"w": "f", "t": "3:35 PM", "x": "No, that's all. Do they call me back or do you call me back? How does that work because I've never done this before."}, {"w": "a", "t": "3:35 PM", "x": "Okay. So basically what happens is that whenever we, you know, receive, receive inquiries or you know, like a support request from foster parents, we forward that information to the shelter team or the organization and then if they think that a follow up is needed then they're gonna reach out to you. So just keep your lines open. I'm not sure how they're gonna follow up with you maybe through text phone call or by your email. Also just to confirm is your email address [foster’s email]"}, {"w": "f", "t": "3:36 PM", "x": "Yes."}, {"w": "a", "t": "3:36 PM", "x": "Okay, got it. Alright, so, thank you so much for wanting to faster assis and if in case you're already fostering if you need anything else, you're more than welcome to reach back at our available twenty percent, alright?"}, {"w": "f", "t": "3:37 PM", "x": "Got it. Thank you, I appreciate you."}, {"w": "a", "t": "3:37 PM", "x": "You're more than welcome and thank you. You have a great rest of your day. Take care."}, {"w": "f", "t": "3:37 PM", "x": "You too."}]}], "monica": [{"kind": "email", "label": "connect@doobert.com email · 2:36 PM ET, reply 2:40 PM ET", "lines": [{"w": "f", "t": "2:36 PM", "subj": "Supplies Appt", "x": "Good afternoon,\n\nI’m fostering Monica A2789003 for the Miami Dade Doral Animal Shelter and am running out of dog food and was wondering if I could go pick some up tomorrow morning?\nShe is recovering weight and is unfortunately quite picky about which dog food she eats, last time she was given Purina One Chicken and Rice Formula and seems to eat that one the most. If you guys have a bag of it would it be possible to get it? If not, any other higher calorie dog food option would be great!\nThank you in advance!\n\nEmily"}, {"w": "a", "t": "2:40 PM", "subj": "Re: Supplies Appt", "x": "Hi Emily!\n\nThank you for reaching out! I will relay your request to pick up dog food from the shelter tomorrow morning, along with Monica’s preference for Purina ONE Chicken and Rice Formula and your request for other higher-calorie food options if that is unavailable.\n\nThank you for looking after Monica and for helping her continue to recover her weight. We appreciate your care and dedication!\n\nWarmly,\nLance\nThe Doobert Team"}]}]};
+  const LEARN = {"orion": {"followups": [{"q": "On the way to the shelter, the foster asks if she should keep trying to feed him. What do you tell her, and why?", "model": "No. Don't feed a kitten who is struggling to breathe, because he can inhale the formula. Keep him warm and go straight to the shelter clinic."}, {"q": "Name three things you'd check to judge how serious a breathing problem is, and what a worrying answer sounds like.", "model": "Effort (open mouth, belly heaving), gum and tongue color (pale, gray or blue is worse than pink), and responsiveness (limp or not moving is worse). Also how long it's been happening."}, {"q": "If this call had come in at 9 PM, after MDAS hours, how would your plan change? Where would you check?", "model": "Check the MDAS page. After hours the on-call vet is only for toxins, car accidents or trauma, and the shelter takes extreme emergencies from 7:30 AM. Log it RED, give clear go-now signs, and loop in the team lead because it's life-threatening."}], "quiz": [{"q": "During MDAS business hours, where should a foster take a kitten in respiratory distress?", "opts": ["Book a Sick Foster Check-Up", "Straight to the MDAS shelter clinic, no appointment needed", "Call the MDAS on-call vet", "Wait for MDAS to reply within 24 business hours"], "a": 1, "why": "The MDAS page says to direct emergencies during business hours to the shelter for immediate care."}, {"q": "Which sign means a neonate's breathing is an emergency?", "opts": ["A couple of sneezes", "Hiccups after feeding", "Open-mouth breathing with the belly heaving", "Sleeping a lot between feeds"], "a": 2, "why": "Kittens breathe through their nose. Open-mouth breathing with heavy effort is respiratory distress."}, {"q": "The kitten is struggling to breathe and refuses the syringe. What do you tell the foster?", "opts": ["Keep trying small amounts", "Try a bottle instead", "Give sugar water", "Don't feed him while he's struggling to breathe"], "a": 3, "why": "Feeding a kitten in respiratory distress risks aspiration."}, {"q": "What priority should this case have on the form?", "opts": ["RED · Immediate", "YELLOW · 24–48h", "GREEN · 72h+", "No priority"], "a": 0, "why": "A life-threatening breathing problem that needs care now is RED."}]}, "pinto": {"followups": [{"q": "At 6 AM the foster texts that Pinto hasn't eaten or pooped since midnight. What do you tell her and what do you do?", "model": "That's a rabbit emergency (possible GI stasis). Follow the St. Hubert's page: after hours, emergencies go to Eclipse. Log it RED, relay to St. Hubert's, and update the original form since it's within 24 hours."}, {"q": "Why might juice in the water be a problem for a rabbit?", "model": "Sugar can upset a rabbit's gut bacteria and cause GI problems. Plain water and hay are best."}, {"q": "What would you write in the Outcome so St. Hubert's has what they need?", "model": "What she chewed and when, the estimated amount, that she's eating, drinking and pooping, that packaging photos were sent, the advice given, the warning signs given, and the reply time."}], "quiz": [{"q": "For a possible ingestion, what do you ask first?", "opts": ["What, how much and when", "The animal's vaccine history", "Where the foster got the ice pack", "The foster's address"], "a": 0, "why": "What, how much and when tell the vet team how serious it could be."}, {"q": "Which is an emergency sign in a rabbit?", "opts": ["Zooming around", "Eating lots of hay", "No poop or food for 8–12 hours", "Drinking water"], "a": 2, "why": "A rabbit that stops eating or pooping can be in GI stasis, which is an emergency."}, {"q": "Should the foster try to make Pinto vomit?", "opts": ["Yes, with hydrogen peroxide", "Yes, with salt water", "Only if she ate a lot", "No. Never induce vomiting unless a vet says to"], "a": 3, "why": "Rabbits can't vomit, and inducing vomiting can hurt any animal. Only a vet decides that."}, {"q": "Why ask for a photo of the packaging?", "opts": ["So the vet team can check the ingredients", "To prove it happened", "It's only for the attachments field", "It isn't needed"], "a": 0, "why": "The label tells the vet team what's in the pack and whether it's toxic."}]}, "sammy": {"followups": [{"q": "An hour later the foster texts: \"Now he's limping and it looks swollen.\" What changes in your response?", "model": "It now needs a vet. Send the Sick Foster Check-Up link with a timeframe (within 24 hours), give go-now signs (bleeding won't stop, won't put weight on it, swelling spreading), raise the priority and add the update to the original form."}, {"q": "Why would you ask the foster to check between Sammy's toes?", "model": "Something stuck there, like a grass awn, glass or a splinter, causes licking and can get infected. It changes the advice."}, {"q": "Write the text you'd send to answer \"Should I bring him in?\"", "model": "Something like: \"Since he's walking normally it can wait for MDAS to review the photo. If he starts limping, it swells, there's discharge or the bleeding won't stop, book a Sick Foster Check-Up within 24 hours. MDAS will reply within 24 business hours.\""}], "quiz": [{"q": "The foster asks \"Should I bring him in?\" What's the best answer?", "opts": ["\"Just wait for MDAS.\"", "\"Go to the ER now.\"", "\"MDAS will review the photo; book a Sick Foster Check-Up if he limps, it swells or there's discharge.\"", "\"No, it's fine.\""], "a": 2, "why": "Give clear criteria for when to book a visit, not just \"wait.\""}, {"q": "What should NOT go on the wound?", "opts": ["Saline", "Clean water", "Gentle pressure with gauze", "Hydrogen peroxide or alcohol"], "a": 3, "why": "Peroxide and alcohol damage tissue and slow healing."}, {"q": "At MDAS, when you send a Sick Foster Check-Up link you also need to:", "opts": ["Give a recommended timeframe", "Call the on-call vet", "Book it for the foster", "Nothing else"], "a": 0, "why": "The MDAS page says to give a recommended timeframe with the link."}, {"q": "What's the best way to ask several questions by text?", "opts": ["One at a time, waiting for each answer", "One message with a short list", "Always call instead", "Wait for photos first"], "a": 1, "why": "A short list in one message saves the foster time and gets everything back at once."}]}, "willis": {"followups": [{"q": "He asks how long until the shelter contacts him, and the org page doesn't give a timeframe. What do you say?", "model": "Be honest: you don't have an exact time, the foster manager will reach out by phone, text or email, and he can contact Doobert Connect again if he hasn't heard back in a few business days."}, {"q": "What would you put in the Details so the foster manager can match him quickly?", "model": "That he already applied online, wants short-term fostering of a male dog (open to older dogs), has a cat at home, is interested in Willis (ID 60550317), and his contact details."}, {"q": "He mentions his cat has never lived with a dog. Why does that matter, and what do you do with it?", "model": "Not every dog is safe with cats, so the shelter needs to match a cat-friendly dog. Note it clearly in the Details."}], "quiz": [{"q": "What does a first-time foster most need from this call?", "opts": ["Medical training", "To know who will contact them and how", "Adoption fee information", "A list of every adoptable dog"], "a": 1, "why": "New fosters mostly want to know the next step."}, {"q": "Which detail matters most for matching a dog?", "opts": ["Other pets in the home", "Their job", "Their favorite breed", "Their zip code only"], "a": 0, "why": "A resident cat changes which dogs are a safe match."}, {"q": "Where do you find who handles new fosters at SPCA Cincinnati?", "opts": ["Search Google", "Ask ChatGPT", "The org's page on the internal website", "Ask the caller"], "a": 2, "why": "Each org's contacts and rules are on its internal page."}, {"q": "What priority should this case have?", "opts": ["RED", "YELLOW", "GREEN", "No priority (info request)"], "a": 3, "why": "It's an information request, not a medical case."}]}, "monica": {"followups": [{"q": "She writes back: \"I only have food for one more day.\" What do you do?", "model": "Flag it as time-sensitive when you relay to MDAS, ask about a same-day or next-morning pickup, and tell her when to expect an answer. For a dog regaining weight, running out matters."}, {"q": "Write the reply you'd send, including when she should expect to hear back.", "model": "Thank her, confirm the pickup request for tomorrow morning with Purina ONE Chicken & Rice or a higher-calorie backup, ask how many days of food she has left, and say MDAS will reply within their usual timeframe."}, {"q": "Monica is regaining weight. What would turn this from a supplies request into a medical case?", "model": "Not eating, losing weight again, vomiting, diarrhea or low energy. Then follow the MDAS medical route and set the right priority."}], "quiz": [{"q": "What key question was missing from the reply?", "opts": ["Monica's breed", "How many days of food are left", "The foster's address", "Monica's favorite toy"], "a": 1, "why": "How much is left tells MDAS how urgent the pickup is."}, {"q": "Why repeat the preferred food and the backup in your reply?", "opts": ["It's required wording", "To make the email longer", "So nothing gets lost when it's relayed", "It isn't needed"], "a": 2, "why": "Confirming the details shows the foster you got it right and keeps the relay accurate."}, {"q": "What should every reply to a foster include?", "opts": ["When to expect a response", "A survey link", "The shelter's address", "Nothing extra"], "a": 0, "why": "A reply time keeps the foster from guessing or following up again."}, {"q": "If she has only one day of food left, what changes?", "opts": ["Nothing", "Tell her to buy food herself", "Close the case", "Flag it as time-sensitive and ask about a quicker pickup"], "a": 3, "why": "Running out matters for a dog regaining weight, so MDAS should know it's urgent."}]}};
+  const PLACES = [
+    {id:"page", label:"Org’s page on the internal website"},
+    {id:"process", label:"Org Support Process Document"},
+    {id:"profile", label:"Doobert System: animal profile & case history"},
+    {id:"dialpad", label:"Dialpad: past calls and texts with this foster"},
+    {id:"team", label:"Ask the team lead or Mattermost"},
+    {id:"google", label:"Search Google"},
+    {id:"chatgpt", label:"Ask ChatGPT or another AI chatbot"}
+  ];
+  const CASES = [
+    {id:"orion", keyPoints:[["Animal", "Kitten, 11–12 days old (ID A2833692)"], ["Earlier today", "Seen at MDAS for not eating or gaining weight; tested fine and given nutritional support"], ["Since 2 PM", "Refused the syringe and pushed it away; started open-mouth breathing"], ["Breathing", "Belly moving a lot with each breath; still trying to move around"], ["Gums", "Pink, checked by a vet at the foster’s workplace"], ["Already tried", "Oxygen cage at the foster’s workplace, not improving"], ["Foster’s question", "Can she bring him to the shelter without an appointment?"], ["Timing", "2:21 PM ET, during MDAS business hours"]], situation:"A foster calls from work about an 11–12-day-old kitten she’s fostering for Miami-Dade Animal Services. She took him to the shelter earlier today because he wasn’t eating well or gaining weight; they tested him, said he was fine and gave him nutritional support. They got home around 1 PM. When she tried to feed him at 2 PM, she noticed he’s breathing with his mouth open and it looks like it takes a lot of effort. She’s scared he won’t make it.", title:"Young kitten struggling to breathe", org:"Miami-Dade County Animal Services", when:"Business hours · Thu 11/19 2:21 PM ET", via:"Call", animal:"Kitten, 11–12 days", open:2,
+     summary:"The foster had just brought Orion home from an MDAS appointment where he tested fine. At 2 PM he refused the syringe and started open-mouth breathing; her own clinic’s vet saw him and put him in oxygen, but he was still struggling. The agent asked when it started, whether the belly or chest was working hard, if he was responsive, his gum color (pink) and whether he’d eaten since the visit, then took his name and ID. The agent marked it high priority, sent her straight to the MDAS shelter clinic, told her no appointment was needed, and told her not to feed him while he was struggling to breathe.",
+     priority:"RED · Immediate (correct)",
+     key:["page"], useful:["profile"], extra:["google","chatgpt"],
+     keyQs:["When did the breathing change start?","Gum and tongue color","Is the chest or belly working hard?","Is he responsive and moving?","Has he eaten or nursed since the visit?","Animal ID"],
+     ideal:"Labored breathing in a neonate is an emergency. During MDAS business hours, send the foster straight to the shelter clinic, say no appointment is needed, don’t feed him, keep him warm on the way, and log it RED.",
+     good:["Asked the questions that matter: effort, gums, responsiveness, onset","Routed to the shelter clinic, which is the MDAS business-hours rule","Answered “do I need an appointment?” clearly","Told her not to feed him while he’s struggling to breathe"],
+     better:["Remind her to keep him warm on the drive","On the form, record that he refused the syringe (the form says he was fed)","Put the “don’t feed him” advice in the Outcome"],
+     takeaway:"Labored breathing in a neonate is an emergency. Check effort, gums and responsiveness, route by the org’s hours, and answer the foster’s practical question before you hang up.",
+     protocol:"MDAS business hours: direct the foster to the shelter location for immediate care. The on-call vet is only for after-hours toxins, car accidents or trauma."},
+    {id:"pinto", keyPoints:[["Animal", "Adult rabbit (ID A0061711297)"], ["What happened", "Bit a hole in a clay-based ice pack; the packaging was kept"], ["When", "About 20 minutes before the call"], ["How much", "Not seen swallowing; foster guesses a very small amount, if any"], ["Right now", "Zooming around, eating hay and pooping"], ["After it happened", "Drank a lot of water with a splash of juice in it"], ["Not seen", "No drooling, bloating or change in behavior"], ["Timing", "10:20 PM ET, after St. Hubert’s hours"]], situation:"It’s 10:20 PM. A St. Hubert’s foster calls about her rabbit, Pinto, who bit into a clay-based ice pack about 20 minutes ago and left a hole in it. She didn’t see Pinto swallow anything. Pinto is running around and seems very happy, but the foster isn’t sure whether she ate any of it and wants to know what to do.", title:"Rabbit bit into a clay ice pack", org:"St. Hubert’s Animal Welfare Center", when:"After hours · Wed 11/18 10:20 PM ET", via:"Call + texts", animal:"Rabbit, adult", open:2,
+     summary:"Pinto bit a hole in a clay-based ice pack about 20 minutes before the call. The foster didn’t see her swallow anything and guessed a very small amount, if any. The agent asked whether she bit it, how much and when, whether she was eating, drinking and pooping, and about drooling or bloating. Pinto was zooming around, eating hay and pooping, and had drunk water with a splash of juice. The agent asked for photos of the packaging and label, told her to keep the pack, offer hay and water, avoid home remedies and not force-feed or induce vomiting, and said St. Hubert’s would reply within 24 business hours. The foster texted the packaging photos right after.",
+     priority:"YELLOW · vet during normal hours (reasonable)",
+     key:["page"], useful:["profile","team"], extra:["google","chatgpt"],
+     keyQs:["How much was chewed or swallowed?","When did it happen?","What’s in the ice pack? (photo of the label)","Eating, drinking and pooping normally?","Drooling, bloating, hunching or teeth grinding?","Animal ID"],
+     ideal:"Find out what, how much and when; get a photo of the label. She’s eating and pooping, so monitor overnight. Give rabbit-specific ER signs (no poop or food for 8–12 hours, bloating, hunching, teeth grinding), name St. Hubert’s after-hours ER (Eclipse) in case those appear, and relay to St. Hubert’s.",
+     good:["Calm, friendly tone that kept the foster at ease","Asked what, how much and when","Checked eating, drinking, droppings, drooling and bloating","Asked for a photo of the packaging and label","Set the reply expectation: 24 business hours","No home remedies, no induced vomiting, no force-feeding"],
+     better:["Give rabbit-specific emergency signs: no poop or food for 8–12 hours, bloating, hunching, teeth grinding","Mention that juice in the water can upset a rabbit’s gut","Name the after-hours ER (Eclipse) in case signs develop overnight"],
+     takeaway:"For a possible ingestion, find out what, how much and when, then check the animal is still eating and pooping. Rabbits need their own warning signs.",
+     protocol:"St. Hubert’s after hours: emergencies go to Eclipse Specialty and Emergency Pet Care. Not needed at Monitor level."},
+    {id:"sammy", keyPoints:[["Animal", "Adult Rottweiler, age not given (ID A2811917)"], ["Injury", "Small cut on the paw after a walk; photo sent"], ["Walking", "Normally, no limp"], ["Licking", "Licking and biting both the top and bottom of the paw"], ["Bleeding", "A scab came off with a little blood after she cleaned it"], ["Foster’s question", "Should I bring him in for a visit?"], ["Timing", "7:34 PM ET, after MDAS medical hours (they end at 5:30 PM)"]], situation:"At 7:34 PM, a Miami-Dade foster texts about Sammy, an adult Rottweiler. Something seemed to hurt his paw on a walk today. He keeps licking it, and she can see a small cut on his paw. She sends a photo and asks if there’s anything she can do.", title:"Dog keeps licking a cut paw", org:"Miami-Dade County Animal Services", when:"After hours · Wed 11/18 7:34 PM ET", via:"Text", animal:"Dog (Rottweiler), adult", open:2,
+     summary:"The foster texted that Sammy hurt his paw on a walk and kept licking a small cut, and sent a photo. The agent replied in 4 minutes with four questions in one list: weight-bearing, licking, swelling or bleeding, and pain. Sammy was walking fine but licking and biting it; a scab had come off with a little blood. The agent gave home care (clean with saline, gentle pressure, e-collar, rest, no alcohol or peroxide), listed signs to watch, and relayed to MDAS. When the foster asked “should I bring him in?”, the agent said to wait for MDAS, who would reply within 24 business hours.",
+     priority:"YELLOW · 24–48h (reasonable)",
+     key:["page"], useful:["profile","dialpad"], extra:["google","chatgpt"],
+     keyQs:["Is he putting weight on it or limping?","Any swelling, redness or bleeding?","Anything stuck between the toes?","Does he seem in pain?","How old is he?"],
+     ideal:"Bundle the questions in one text, give care steps she can do tonight (clean, pressure, e-collar, rest, no peroxide), list signs to watch, and answer “should I bring him in?” with when to book a Sick Foster Check-Up (limping, swelling, discharge). Relay to MDAS.",
+     good:["Replied within 4 minutes and thanked the foster for the photo","Sent all four questions in one tidy list","Gave clear steps the foster could do tonight","Warned against alcohol, peroxide and medication","Listed what to watch for and when to expect a reply"],
+     better:["Ask the dog’s age","Ask her to check between the toes for anything stuck","Answer “should I bring him in?” with when to book a Sick Foster Check-Up, for example if he starts limping or it swells"],
+     takeaway:"On text, bundle your questions into one list, reply fast, and give care steps the foster can do tonight. Then give a clear “book a visit if…” line.",
+     protocol:"MDAS after hours: the on-call vet is only for toxins, car accidents or trauma. Otherwise monitor and relay. A Sick Foster Check-Up link should come with a recommended timeframe."},
+    {id:"willis", keyPoints:[["Caller", "New applicant who already applied online with SPCA Cincinnati"], ["Why he called", "The shelter emailed him to call Doobert Connect; he didn’t know the next step"], ["Wants", "Short-term fostering, a male dog, open to older dogs, about a week at a time"], ["At home", "Has a cat"], ["Dog he likes", "Willis, ID 60550317 (kennel 2)"], ["His question", "“Do they call me or do you?”"], ["Timing", "3:31 PM ET, business hours"]], situation:"A man calls during business hours. He filled out an online application to foster animals short-term with SPCA Cincinnati. The shelter emailed him and told him to call Doobert Connect, but he doesn’t know what to do next.", title:"New foster asks what happens next", org:"SPCA Cincinnati", when:"Business hours · Thu 11/19 3:31 PM ET", via:"Call", animal:"Dog (adoptable), adult", open:2,
+     summary:"A new applicant had applied online to short-term foster with SPCA Cincinnati, got an email telling him to call, and didn’t know the next step. The agent confirmed the organization and location, checked he had applied, and asked what kind of animal he wanted. He wanted a male dog (he has a cat at home) and named one dog, whose ID the agent read back. When he asked “do they call me or do you?”, the agent explained that Doobert passes the details to the shelter, who will contact him by phone, text or email, then confirmed his email address.",
+     priority:"No priority needed (info request)",
+     key:["page","process"], useful:["profile"], extra:["google","chatgpt"],
+     keyQs:["Which organization?","Have you already applied?","What kind of animal, and any one in mind?","Any other pets at home?","Best way to reach you?"],
+     ideal:"Confirm the org and that he applied, capture his preferences and the dog’s ID, note the resident cat (it matters for matching a dog), tell him plainly who will contact him and roughly when, and relay to the foster manager.",
+     good:["Confirmed the right organization and location first","Captured preferences and read the animal ID back","Answered “do they call me or do you?” in plain words","Confirmed the email before ending the call"],
+     better:["Record the resident cat on the form, since it matters for matching a dog","Give a rough idea of when the shelter usually follows up"],
+     takeaway:"First-time fosters mostly want to know what happens next. Tell them who will contact them and how, and capture anything that affects the match.",
+     protocol:"No new-foster rule on the SPCA Cincinnati page. Assigned to the foster manager."},
+    {id:"monica", keyPoints:[["Animal", "Adult dog, regaining weight (ID A2789003)"], ["Request", "Running out of dog food; wants to pick some up at the shelter tomorrow morning"], ["Food preference", "Picky; eats Purina ONE Chicken & Rice best"], ["Backup", "Any higher-calorie dog food"], ["Not stated", "How many days of food are left"], ["Timing", "2:36 PM ET email, business hours"]], situation:"A Miami-Dade foster emails in the afternoon. She’s fostering Monica, an adult dog who is regaining weight, and is running out of dog food. She asks if she can pick up food at the shelter tomorrow morning. Monica is picky: she eats Purina ONE Chicken & Rice best, but any higher-calorie food would work as a backup.", title:"Food refill for a dog regaining weight", org:"Miami-Dade County Animal Services", when:"Business hours · Thu 11/19 2:36 PM ET", via:"Email", animal:"Dog, adult", open:1,
+     summary:"The foster emailed that she was running out of dog food and asked to pick some up the next morning. Monica is regaining weight and picky, eats Purina ONE Chicken & Rice best, and any higher-calorie food would do as a backup. The agent replied 4 minutes later, repeated the request, the preferred food and the backup, said it would be relayed to the shelter, and thanked her warmly.",
+     priority:"Supplies request (no medical priority)",
+     key:["page"], useful:["profile"], extra:["google","chatgpt"],
+     keyQs:["How many days of food are left?","When can you pick up?","Preferred food and a backup","Is she still eating well and gaining?"],
+     ideal:"Reply quickly, confirm exactly what she asked for (pickup tomorrow, Purina ONE Chicken & Rice or a higher-calorie backup), ask how much food is left, tell her when to expect MDAS’s reply, and relay to the MDAS team.",
+     good:["Replied in 4 minutes","Repeated the request, preferred food and backup so nothing gets lost","Warm thanks that recognizes the foster’s work"],
+     better:["Ask how many days of food are left","Tell her when to expect a reply from MDAS"],
+     takeaway:"A good supplies reply confirms exactly what was asked for. Add how much is left and when they’ll hear back, so the foster isn’t left guessing.",
+     protocol:"Supplies requests go to the MDAS team."}
+  ];
+  // Quick-check questions that are about safety. Missing one means a one-on-one.
+  const CRITICAL = {orion:[0,3], pinto:[2], sammy:[1], willis:[], monica:[]};
+  const PASS = 80, REVIEW = 60;
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const placeLabel = id => (PLACES.find(p => p.id === id) || {}).label || id;
+
+  // One case per week, same for everyone; weeks start Monday.
+  const now = new Date();
+  const dayNum = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  const week = Math.floor((dayNum + 3) / 7);
+  const monday = new Date((week * 7 - 3) * 86400000);
+  const WEEK_LABEL = monday.toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric", timeZone:"UTC"});
+  const WEEK_ID = monday.toISOString().slice(0,10);
+  const c = CASES[week % CASES.length];
+  const L = LEARN[c.id];
+
+  // Progress is kept in this browser until the case is submitted.
+  const KEY = "cotd-site:" + WEEK_ID + ":" + c.id;
+  let s = {};
+  try { s = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { s = {}; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e) {} };
+  try { $("name").value = localStorage.getItem("cotd-name") || ""; } catch(e) {}
+  $("name").addEventListener("input", () => { try { localStorage.setItem("cotd-name", $("name").value); } catch(e) {} updateSubmit(); });
+
+  // ---------- Step 1 ----------
+  $("weekLine").textContent = "Week of " + WEEK_LABEL + " · Doobert Connect Continuous Education";
+  $("title").textContent = c.title;
+  $("facts").innerHTML = [["When", c.when], ["Came in by", c.via], ["Animal", c.animal], ["Organization", c.org]].map(([k,v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
+  $("situation").textContent = c.situation;
+  $("keyPoints").innerHTML = c.keyPoints.map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+
+  // ---------- Step 2 ----------
+  $("places").innerHTML = PLACES.map(p => `<label class="tag"><input type="checkbox" value="${p.id}" ${(s.places||[]).includes(p.id)?"checked":""}><span>${esc(p.label)}</span></label>`).join("");
+  $("qs").value = s.qs || ""; $("plan").value = s.plan || "";
+  function gate(){
+    const q = $("qs").value.trim(), p = $("plan").value.trim();
+    const lines = q.split(/\n+/).filter(l => l.trim().length > 3).length;
+    const places = $("places").querySelectorAll("input:checked").length;
+    const qOk = lines >= 2 && lines <= 5 && q.length >= 120;
+    $("qsCount").textContent = qOk ? "✓ Looks good" : lines > 5 ? `Keep it to 5 questions or fewer (you have ${lines})` : `Add 2 to 5 questions (${lines} so far · ${Math.min(q.length,120)}/120 characters)`;
+    $("qsCount").className = "count" + (qOk ? " ok" : "");
+    $("planCount").textContent = p.length >= 300 ? "✓ Looks good" : `${Math.min(p.length,300)}/300 characters`;
+    $("planCount").className = "count" + (p.length >= 300 ? " ok" : "");
+    const ok = qOk && places >= 1 && p.length >= 300;
+    $("lockBtn").disabled = !ok || !!s.locked;
+    $("gateMsg").textContent = s.locked ? "Locked in." : ok ? "You can’t change your approach after you lock it in." : places < 1 ? "Pick at least one place you’d look." : "";
+    return ok;
+  }
+  function onEdit(){
+    if (s.locked) return;
+    if (!s.startedAt) s.startedAt = Date.now();
+    s.qs = $("qs").value; s.plan = $("plan").value; s.places = [...$("places").querySelectorAll("input:checked")].map(x => x.value);
+    save(); gate();
+  }
+  $("qs").addEventListener("input", onEdit); $("plan").addEventListener("input", onEdit);
+  $("places").querySelectorAll("input").forEach(el => el.addEventListener("change", onEdit));
+  $("lockBtn").addEventListener("click", () => { if (!gate()) return; onEdit(); s.locked = true; save(); lockInputs(); showAfter(true); });
+  function lockInputs(){ [$("qs"), $("plan")].forEach(el => el.disabled = true); $("places").querySelectorAll("input").forEach(el => el.disabled = true); gate(); }
+
+  // ---------- Step 3 ----------
+  function recHTML(r){
+    return `<div class="rec"><div class="rec-h">${esc(r.label)}</div><div class="thread">${r.lines.map(m => `<div class="msg ${m.w}"><div class="who">${m.w==="a"?"DC agent":"Foster"} · ${esc(m.t)}</div><div class="b">${m.x==="[photo]"?"📷 Photo sent":esc(m.x)}</div></div>`).join("")}</div></div>`;
+  }
+  function showAfter(scroll){
+    $("locked").hidden = true; $("after").hidden = false;
+    $("summary").textContent = c.summary;
+    $("priority").textContent = "Priority on the form: " + c.priority;
+    $("records").innerHTML = RECS[c.id].map(recHTML).join("");
+    $("good").innerHTML = c.good.map(x => `<li>${esc(x)}</li>`).join("");
+    $("better").innerHTML = c.better.map(x => `<li>${esc(x)}</li>`).join("");
+    s.asked = s.asked || [];
+    $("selfCheck").innerHTML = c.keyQs.map((q,i) => `<label class="check"><input type="checkbox" data-i="${i}" ${s.asked.includes(i)?"checked":""} ${s.submitted?"disabled":""}><span>${esc(q)}</span></label>`).join("");
+    $("selfCheck").querySelectorAll("input").forEach(el => el.addEventListener("change", () => {
+      const i = +el.dataset.i; s.asked = s.asked.filter(x => x !== i); if (el.checked) s.asked.push(i); save(); renderRecap();
+    }));
+    $("yourQs").textContent = "Your questions:\n" + (s.qs || "");
+    $("yourPlan").textContent = "Your plan:\n" + (s.plan || "");
+    $("ideal").textContent = c.ideal;
+    const picked = s.places || [];
+    $("placesResult").innerHTML = PLACES.filter(p => picked.includes(p.id) || c.key.includes(p.id)).map(p => {
+      const isKey = c.key.includes(p.id), isExtra = c.extra.includes(p.id), got = picked.includes(p.id);
+      return `<span class="rtag ${isKey?"key":isExtra?"extra":""}">${isKey ? (got ? "✓ " : "Missed: ") : isExtra ? "Not needed: " : "Optional: "}${esc(p.label)}</span>`;
+    }).join("");
+    $("takeaway").textContent = c.takeaway;
+    $("protocol").textContent = c.protocol;
+    renderPractice(); renderQuiz(); renderReflect(); renderRecap();
+    if (scroll) $("after").scrollIntoView({behavior:"smooth"});
+  }
+
+  // ---------- Step 4: practice ----------
+  function renderPractice(){
+    s.fu = s.fu || []; s.rate = s.rate || [];
+    const shown = !!s.fuShown;
+    $("fuBody").innerHTML = L.followups.map((x,i) => `<div class="fu"><label class="q" for="fu${i}">${i+1}. ${esc(x.q)}</label>
+      <textarea id="fu${i}" data-i="${i}" ${shown||s.submitted?"disabled":""} placeholder="Your answer" style="min-height:80px">${esc(s.fu[i] || "")}</textarea>
+      ${shown ? `<div class="model"><strong>Model answer:</strong> ${esc(x.model)}</div>
+        <div class="rates"><span class="small">How close were you?</span>${[["got","Got it"],["part","Partly"],["miss","Missed it"]].map(([k,l]) => `<button type="button" class="rate ${k}" data-i="${i}" data-r="${k}" aria-pressed="${s.rate[i]===k}" ${s.submitted?"disabled":""}>${l}</button>`).join("")}</div>` : ""}</div>`).join("")
+      + (shown ? "" : `<div class="row"><button class="btn secondary" id="showModel" type="button" disabled>Show model answers</button><small id="fuMsg"></small></div>`);
+    if (!shown) {
+      const g = () => { const ok = L.followups.every((_,i) => (s.fu[i] || "").trim().length >= 60); $("showModel").disabled = !ok; $("fuMsg").textContent = ok ? "" : "Write at least 60 characters for each answer."; };
+      $("fuBody").querySelectorAll("textarea").forEach(el => el.addEventListener("input", () => { s.fu[+el.dataset.i] = el.value; save(); g(); }));
+      g();
+      $("showModel").addEventListener("click", () => { s.fuShown = true; save(); renderPractice(); });
+    } else {
+      $("fuBody").querySelectorAll(".rate").forEach(b => b.addEventListener("click", () => { s.rate[+b.dataset.i] = b.dataset.r; save(); renderPractice(); renderRecap(); }));
+    }
+    updateSubmit();
+  }
+
+  // ---------- Step 5: quick check ----------
+  function renderQuiz(){
+    s.quiz = s.quiz || {};
+    const right = L.quiz.filter((q,i) => s.quiz[i] === q.a).length, answered = Object.keys(s.quiz).length;
+    $("quizBody").innerHTML = L.quiz.map((q,i) => { const p = s.quiz[i];
+      return `<div class="qz"><div class="q">${i+1}. ${esc(q.q)}</div>${q.opts.map((o,j) => `<button type="button" class="qopt${p!=null ? (j===q.a?" right":j===p?" wrong":"") : ""}" data-q="${i}" data-o="${j}" ${p!=null?"disabled":""}>${esc(o)}</button>`).join("")}${p!=null ? `<div class="why">${p===q.a?"Correct. ":"Not quite. "}${esc(q.why)}</div>` : ""}</div>`; }).join("")
+      + (answered === L.quiz.length ? `<p><strong>You got ${right} of ${L.quiz.length}.</strong></p>` : "");
+    $("quizBody").querySelectorAll(".qopt").forEach(b => b.addEventListener("click", () => { if (s.quiz[b.dataset.q] != null) return; s.quiz[b.dataset.q] = +b.dataset.o; save(); renderQuiz(); renderRecap(); }));
+    updateSubmit();
+  }
+
+  // ---------- Step 6: learning summary ----------
+  function renderRecap(){
+    const missedQs = c.keyQs.filter((_,i) => !(s.asked||[]).includes(i));
+    const missedPlaces = c.key.filter(id => !(s.places||[]).includes(id)).map(placeLabel);
+    const extraPlaces = (s.places||[]).filter(id => c.extra.includes(id)).map(placeLabel);
+    const practice = s.fuShown ? L.followups.map((x,i) => ({x, r:(s.rate||[])[i]})).filter(o => o.r && o.r !== "got") : [];
+    const quizMiss = L.quiz.map((q,i) => s.quiz && s.quiz[i] != null && s.quiz[i] !== q.a ? q : null).filter(Boolean);
+    const li = a => a.length ? `<ul>${a.map(x => `<li>${x}</li>`).join("")}</ul>` : "";
+    $("recap").innerHTML = `
+      <div class="box"><h3>Questions you didn’t ask</h3>${missedQs.length ? li(missedQs.map(esc)) : "<p class='small'>You covered them all.</p>"}</div>
+      <div class="box"><h3>Where to look</h3>${missedPlaces.length || extraPlaces.length ? li(missedPlaces.map(p => "Missed: " + esc(p)).concat(extraPlaces.map(p => "Not needed: " + esc(p)))) : "<p class='small'>You looked in the right places.</p>"}</div>
+      <div class="box"><h3>Practice answers to review</h3>${!s.fuShown ? "<p class='small'>Finish step 4 to see these.</p>" : practice.length ? li(practice.map(o => `<strong>${esc(o.x.q)}</strong><br>${esc(o.x.model)}`)) : (s.rate||[]).filter(Boolean).length === L.followups.length ? "<p class='small'>You got all three.</p>" : "<p class='small'>Rate each practice answer in step 4.</p>"}</div>
+      <div class="box"><h3>Quick check</h3>${Object.keys(s.quiz||{}).length < L.quiz.length ? "<p class='small'>Finish step 5 to see these.</p>" : quizMiss.length ? li(quizMiss.map(q => `<strong>${esc(q.q)}</strong><br>Answer: ${esc(q.opts[q.a])}. ${esc(q.why)}`)) : "<p class='small'>All correct.</p>"}</div>
+      <div class="takeaway"><div class="k">Remember</div><p>${esc(c.takeaway)}</p></div>`;
+  }
+
+  // ---------- Step 7: reflect ----------
+  function renderReflect(){
+    const el = $("reflect"); el.value = s.reflection || ""; el.disabled = !!s.submitted;
+    const upd = () => { const n = el.value.trim().length; $("reflectCount").textContent = n >= 100 ? "✓ Looks good" : `${n}/100 characters`; $("reflectCount").className = "count" + (n >= 100 ? " ok" : ""); };
+    upd();
+    el.oninput = () => { s.reflection = el.value; save(); upd(); updateSubmit(); };
+  }
+
+  // ---------- Scoring ----------
+  function score(){
+    const quizRight = L.quiz.filter((q,i) => s.quiz && s.quiz[i] === q.a).length;
+    const quizPts = quizRight / L.quiz.length * 40;
+    const askPts = (s.asked||[]).length / c.keyQs.length * 30;
+    const keyPicked = c.key.filter(id => (s.places||[]).includes(id)).length;
+    const extra = (s.places||[]).filter(id => c.extra.includes(id)).length;
+    const placePts = Math.max(0, keyPicked / c.key.length * 15 - extra * 5);
+    const rv = {got:5, part:2.5, miss:0};
+    const practicePts = (s.rate||[]).reduce((t,r) => t + (rv[r] || 0), 0);
+    const total = Math.round(quizPts + askPts + placePts + practicePts);
+    const critMiss = (CRITICAL[c.id]||[]).filter(i => s.quiz && s.quiz[i] !== L.quiz[i].a).map(i => L.quiz[i].q);
+    const result = critMiss.length || total < REVIEW ? "1-ON-1" : total < PASS ? "REVIEW" : "PASS";
+    const follow = [];
+    if (critMiss.length) follow.push("Missed safety question: " + critMiss.join(" / "));
+    if (quizRight < L.quiz.length) follow.push(`Quick check ${quizRight}/${L.quiz.length}`);
+    if ((s.asked||[]).length < c.keyQs.length) follow.push(`Asked ${(s.asked||[]).length} of ${c.keyQs.length} key questions`);
+    const pm = (s.rate||[]).filter(r => r !== "got").length; if (pm) follow.push(`${pm} of ${L.followups.length} practice answers not right`);
+    if (keyPicked < c.key.length) follow.push("Missed where to look: " + c.key.filter(id => !(s.places||[]).includes(id)).map(placeLabel).join(", "));
+    if (extra) follow.push("Checked places not needed: " + (s.places||[]).filter(id => c.extra.includes(id)).map(placeLabel).join(", "));
+    return {total, result, follow: result === "PASS" && !follow.length ? "Nothing needed" : follow.join("; ")};
+  }
+
+  function ready(){
+    return $("name").value.trim().length >= 2 && s.fuShown && (s.rate||[]).filter(Boolean).length === L.followups.length
+      && Object.keys(s.quiz||{}).length === L.quiz.length && (s.reflection||"").trim().length >= 100;
+  }
+  function updateSubmit(){
+    if (!$("submitBtn") || s.submitted) return;
+    const ok = ready();
+    $("submitBtn").disabled = !ok;
+    $("submitHint").textContent = ok ? "Ready. You can’t change your answers after submitting." : $("name").value.trim().length < 2 ? "Enter your full name at the top, and finish steps 4 to 7." : "Finish steps 4 to 7 (rate all three practice answers), then submit.";
+  }
+
+  function showResult(r){
+    $("submitCard").hidden = true;
+    const card = $("resultCard"); card.hidden = false;
+    card.className = "card result " + (r.result === "PASS" ? "" : r.result === "REVIEW" ? "review" : "oneonone");
+    $("resBig").textContent = r.result === "PASS" ? "✓ PASS" : r.result === "REVIEW" ? "REVIEW" : "ONE-ON-ONE";
+    $("resScore").textContent = `${r.total} out of 100`;
+    $("resNote").textContent = r.result === "PASS" ? "Great work. Your result has been recorded. A new case comes out next Monday."
+      : r.result === "REVIEW" ? "Your result has been recorded. Reread your learning summary above before your next shift."
+      : "Your result has been recorded. Your team lead will set up a short one-on-one to go over this case with you.";
+  }
+
+  $("submitBtn").addEventListener("click", async () => {
+    if (!ready()) return;
+    const r = score();
+    const minutes = s.startedAt ? Math.max(1, Math.round((Date.now() - s.startedAt) / 60000)) : "";
+    const answers = `Questions:\n${s.qs}\n\nLooked: ${(s.places||[]).map(placeLabel).join(", ")}\n\nPlan:\n${s.plan}\n\nPractice:\n` +
+      L.followups.map((x,i) => `${i+1}. ${(s.fu||[])[i] || ""} [${({got:"Got it",part:"Partly",miss:"Missed"})[(s.rate||[])[i]] || ""}]`).join("\n") + `\n\nReflection:\n${s.reflection}`;
+    const payload = {type:"case_of_the_day", name:$("name").value.trim(), week:WEEK_LABEL, caseTitle:c.title + " (" + c.org + ")", result:r.result, score:r.total, followUp:r.follow, minutes, answers};
+    $("submitBtn").disabled = true; $("submitBtn").textContent = "Submitting…";
+    const st = $("status"); st.hidden = false; st.className = "status sending"; st.textContent = "Sending your results…";
+    let ok = false;
+    if (/^https:\/\/script\.google\.com\//.test(SCRIPT_URL)) {
+      try { await fetch(SCRIPT_URL, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain"}, body: JSON.stringify(payload)}); ok = true; } catch(e) {}
+    }
+    if (!ok) { st.className = "status failed"; st.textContent = "Your results couldn’t be recorded. Please tell your team lead."; $("submitBtn").disabled = false; $("submitBtn").textContent = "Submit"; return; }
+    s.submitted = true; s.result = r; save();
+    [$("reflect"), $("name")].forEach(el => el.disabled = true);
+    showResult(r);
+    $("resultCard").scrollIntoView({behavior:"smooth"});
+  });
+
+  // Restore progress
+  gate();
+  if (s.locked) { lockInputs(); showAfter(false); }
+  if (s.submitted && s.result) { $("name").disabled = true; showResult(s.result); }
+  updateSubmit();
+})();
+</script>
+</body>
+</html>
